@@ -5,16 +5,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            background-color: lightgrey;
+        }
+
+        h2 {
+            text-align: center;
+            color: orange;
+            font-size: 40px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            overflow-x: auto;
+        }
+
+      
+        .aEnlac {
+            text-decoration: none;
+            color: white;
+            display: block;
+            background-color: grey;
+            padding: 14px 20px;
+            text-align: center;
+            margin-top: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        a:hover {
+            background-color: lightgray;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
         <div class="form-container">
-            <h2>Estadisticas de {{trabajador.nombre}}
+            <h2>Estadisticas de {{trabajador.nombre}}</h2>
                 <ul>
                     {% for tarea in tareas %}
                     <li>
-                        Tarea ID: {{ tarea.id }} - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
+                       <a  href="{% url 'detalle_tarea' tarea.id %}">   Tarea ID: {{ tarea.id }}</a> - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
                     </li>
                     {% empty %}
                     <p>No hay tareas registradas para este trabajador</p>
@@ -22,7 +66,7 @@
 
                 </ul>
 
-                <a href="/paginaInicial/">Volver al Inicio</a>
+                <a class="aEnlac"  href="/paginaInicial/">Volver al Inicio</a>
         </div>
     </div>
 </body>
