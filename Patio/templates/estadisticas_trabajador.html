@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Estadisticas de {{trabajador.nombre}}
+                <ul>
+                    {% for tarea in tareas %}
+                    <li>
+                        Tarea ID: {{ tarea.id }} - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
+                    </li>
+                    {% empty %}
+                    <p>No hay tareas registradas para este trabajador</p>
+                    {% endfor %}
+
+                </ul>
+
+                <a href="/paginaInicial/">Volver al Inicio</a>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -92,11 +92,16 @@
 
             <form method="post">
                 {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="error">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
                 <div class="form-group">
                     {{ form.idArticulo.label_tag }}
                     {{ form.idArticulo }}
+                    <div id="articulos" style="background-color: lightblue;text-align: center;"></div>
                 </div>
-
                 <div class="form-group">
                     {{ form.cantidad_buena.label_tag }}
                     {{ form.cantidad_buena }}
@@ -116,5 +121,23 @@
             </form>
         </div>
     </div>
+    {{articulos|json_script:"articulos_data"}}
+    <script>
+       const articulo=JSON.parse(document.getElementById('articulos_data').textContent)
+       document.getElementById('id_idArticulo').addEventListener('input', function(){
+        const id=parseInt(this.value)
+        const nombre=articulo[id];
+        const div = document.getElementById('articulos'); 
+            
+        if (nombre) {
+            div.innerHTML = `<h3>${nombre}</h3>`;
+        } else if (this.value === "") {
+            div.innerHTML = "";
+        } else {
+            div.innerHTML = `<h3>Articulo no encontrado</h3>`;
+        }
+       })
+
+        </script>
 </body>
 </html>

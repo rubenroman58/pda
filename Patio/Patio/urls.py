@@ -16,19 +16,23 @@ Including another URLconf
 """
 from django.contrib import  admin
 from django.urls import path
-from pda.views import iniciar_tarea,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
+from pda.views import iniciar_tarea,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('iniciar-tarea/', iniciar_tarea, name='iniciar_tarea'),
     path('crear-paquete/<int:tarea_id>/', crear_paquete, name='crear_paquete'),
-    path('',home),
+    path('',home,name='home'),
     path('paginaInicial/',home),
     path('cerrar_programa/',salir),
     path('iniciar_tarea/',iniciar_tarea),
     path('finalizar-tarea/<int:tarea_id>/', finalizar_tarea, name='finalizar_tarea'),
     path('seleccionar_albaran/', seleccionar_albaran, name='seleccionar_albaran'),
     path('agregar_lineas/<int:albaran_id>/', agregar_lineas, name='agregar_lineas'),
-    path('estadisticas/',estadisticas)
+    path('estadisticas/',estadisticas),
+    path('estadisticasTrabajadores/',lista_trabajadores),
+    path('lista_tareas/',lista_tareas_completa),
+    path('tarea/<int:tarea_id>/',detalles_tarea, name='detalle_tarea'),
+    path('estadisticas_trabajador/<int:trabajador_id>/',estadisticas_trabajador,name='estadisticas_trabajador')
 ]
 

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,TipoTarea,Trabajador,Articulo
-from .forms import PatioForm, PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm
+from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm,TrabajadorForm
+
 from datetime import datetime
 from django.db.models import Sum  
 from django.shortcuts import get_object_or_404
@@ -136,12 +137,77 @@ def agregar_lineas(request,albaran_id):
              cantidad_mala=cantidad_mala
          )
          return redirect('agregar_lineas', albaran_id=albaran.id)
+        else:           
+            return render(request,'agregar_lineas.html',{
+                'form':form,
+                'albaran':albaran,
+                'articulos':{art.id: art.nombre for art in Articulo.objects.all()},
+            })
     else:
         form = LineaArticuloForm()
-
-    return render(request, 'agregar_lineas.html', {'form': form, 'albaran': albaran})
+        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        return render(request, 'agregar_lineas.html', {
+            'form': form, 
+            'albaran': albaran,
+            'articulos':articulos_dict
+             })
 def salir(request):
     return render(request,'cerrar_programa.html')
 
 def estadisticas(request):
+
     return render(request,'estadisticas.html')
+
+def lista_trabajadores(request):
+    trabajadores=Trabajador.objects.all()
+
+    trabajadores_lista=[]
+    for tra in trabajadores:
+        trabajador_lista={
+           'id':tra.id,
+           'nombre':tra.nombre
+        }
+        trabajadores_lista.append(trabajador_lista)
+
+    return render(request,'lista_trabajadores.html',
+                   {
+                       'trabajadores_lista':trabajadores_lista
+                   })
+
+
+def lista_tareas_completa(request):
+    tareas = Patio.objects.all().order_by('-fecha')
+    
+    tareas_info = []
+    for tarea in tareas:
+        tarea_info = {
+            'id': tarea.id,
+            'fecha': tarea.fecha,
+            'horaInicio': tarea.horaInicio,
+            'horaFin': tarea.horaFin,
+            'tipo_tarea': TipoTarea.objects.filter(id=tarea.idTipTarea).first(),
+            'operador1': Trabajador.objects.filter(id=tarea.idOper1).first(),
+            'operador2': Trabajador.objects.filter(id=tarea.idOper2).first() if tarea.idOper2 else None,
+            'cantidad': tarea.cantidad
+        }
+        tareas_info.append(tarea_info)
+
+    return render(request, 'lista_tareas.html', {
+        'tareas_info': tareas_info
+    })
+def detalles_tarea(request,tarea_id):
+    tarea=get_object_or_404(Patio,id=tarea_id)
+    paquetes=Paquete.objects.filter(tarea=tarea)
+    return render(request,'detalle_tarea.html',{
+        'tarea':tarea,
+        'paquetes':paquetes
+        })
+
+def estadisticas_trabajador(request,trabajador_id):
+    trabajador=get_object_or_404(Trabajador, id=trabajador_id)
+    tareas=Patio.objects.filter(idOper1=trabajador_id)
+
+    return render(request,'estadisticas_trabajador.html',{
+        'trabajador':trabajador,
+        'tareas':tareas
+    })

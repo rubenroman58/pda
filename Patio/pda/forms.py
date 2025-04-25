@@ -1,5 +1,13 @@
 from django import forms
-from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,Trabajador,Articulo,TipoTarea
+from .models import Patio,Trabajador, Paquete,AlbaranDevolucion,LineaArticulo,Trabajador,Articulo,TipoTarea
+
+class TrabajadorForm(forms.ModelForm):
+    nombre=forms.CharField(label='Trabajador')
+    class Meta:
+        model=Trabajador
+        fields=['nombre']
+
+
 
 class PatioForm(forms.ModelForm):
     idOper1 = forms.IntegerField(required=True, min_value=0, label='Trab.1')
@@ -54,10 +62,16 @@ class AlbaranForm(forms.ModelForm):
 
 class LineaArticuloForm(forms.ModelForm):
     idArticulo = forms.IntegerField(required=True,label='Id.Articulo')
-    idArticulo=forms.IntegerField(min_value=0)
     cantidad_buena=forms.IntegerField(min_value=0)
     cantidad_mala=forms.IntegerField(min_value=0)
     chatarra=forms.IntegerField(min_value=0)
+
+    def clean(self):
+        cleaned_data=super().clean()
+        idArticulo=cleaned_data.get('idArticulo')
+        if not Articulo.objects.filter(id=idArticulo).exists():
+            raise forms.ValidationError('El Id del articulo es invalido')
+        return cleaned_data
     
     class Meta:
         model = LineaArticulo
