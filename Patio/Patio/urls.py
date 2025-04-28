@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import  admin
 from django.urls import path
-from pda.views import iniciar_tarea,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
+from pda.views import iniciar_tarea,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,6 +33,9 @@ urlpatterns = [
     path('estadisticasTrabajadores/',lista_trabajadores),
     path('lista_tareas/',lista_tareas_completa),
     path('tarea/<int:tarea_id>/',detalles_tarea, name='detalle_tarea'),
-    path('estadisticas_trabajador/<int:trabajador_id>/',estadisticas_trabajador,name='estadisticas_trabajador')
+    path('estadisticas_trabajador/<int:trabajador_id>/',estadisticas_trabajador,name='estadisticas_trabajador'),
+    path('lista_albaranes/',lista_albaranes_completa),
+    path('detalle_albaran/<int:albaran_id>/',detalles_albaran, name='detalle_albaran'),
+    path('informacionIndek/',informacionIndek, name='informacionIndek')
 ]
 

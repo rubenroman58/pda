@@ -204,6 +204,7 @@ def detalles_tarea(request,tarea_id):
         })
 
 def estadisticas_trabajador(request,trabajador_id):
+
     trabajador=get_object_or_404(Trabajador, id=trabajador_id)
     tareas=Patio.objects.filter(idOper1=trabajador_id)
 
@@ -211,3 +212,28 @@ def estadisticas_trabajador(request,trabajador_id):
         'trabajador':trabajador,
         'tareas':tareas
     })
+
+
+def lista_albaranes_completa(request):
+
+    listaAlbaranes=AlbaranDevolucion.objects.all().order_by('-fecha')
+    albaranesinfo=[]
+    for albaran in listaAlbaranes:
+        albaraninfo={
+        'Numero': albaran.numero
+        }
+        albaranesinfo.append(albaraninfo)
+    return render (request,'lista_albaranes.html',{
+        'albaranesinfo':albaranesinfo
+    }) 
+
+def detalles_albaran(request,albaran_id):
+    albaran=get_object_or_404(AlbaranDevolucion,id=albaran_id)
+    articulos=AlbaranDevolucion.objects.filter(albaran=albaran)
+    return render(request,'detalle_albaran.html',{
+        'albaran':albaran,
+        'articulos':articulos
+    })
+
+def informacionIndek(request):
+    return render(request,'informacionIndek.html')

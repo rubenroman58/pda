@@ -29,9 +29,10 @@ class Paquete (models.Model):
     
 class AlbaranDevolucion(models.Model):
     numero=models.IntegerField(verbose_name='Num.Albaran', unique=True)
+    fecha=models.DateField(default=timezone.localdate())
    
     def __str__(self):
-        return f"El numero del albaran es {self.numero}"
+        return f"El numero del albaran es {self.numero}, fecha:{self.fecha}"
     
 class LineaArticulo(models.Model):
     albaran = models.ForeignKey(AlbaranDevolucion, on_delete=models.CASCADE, related_name='lineas')
