@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
-from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,TipoTarea,Trabajador,Articulo
-from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm,TrabajadorForm
-
-from datetime import datetime
+from datetime import datetime,timedelta,date
 from django.db.models import Sum  
 from django.shortcuts import get_object_or_404
+from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,TipoTarea,Trabajador,Articulo
+from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm,TrabajadorForm
 
 
 def iniciar_tarea(request):
@@ -29,8 +28,6 @@ def iniciar_tarea(request):
         'trabajadores': trabajadores_dict,
         'tipos_tarea': tipos_tarea_dict,
     })
-
-
 
 def crear_paquete(request, tarea_id):
     tarea = get_object_or_404(Patio, id=tarea_id)
@@ -93,13 +90,11 @@ def crear_paquete(request, tarea_id):
             'articulos': articulos_dict,
         })
 
-
 def finalizar_tarea(request, tarea_id):
     tarea = get_object_or_404(Patio, id=tarea_id)
     tarea.horaFin = datetime.now().time().replace(microsecond=0)  
     tarea.save()
     return redirect('iniciar_tarea') 
-
 
 def seleccionar_albaran(request):
     if request.method == 'POST':
@@ -114,8 +109,6 @@ def seleccionar_albaran(request):
     else:
         form = AlbaranForm()
     return render(request, 'seleccionar_albaran.html', {'form': form})
-
-
 def home (request): 
     return render(request,'index.html')
 
@@ -174,7 +167,6 @@ def lista_trabajadores(request):
                        'trabajadores_lista':trabajadores_lista
                    })
 
-
 def lista_tareas_completa(request):
     tareas = Patio.objects.all().order_by('-fecha')
     
@@ -207,10 +199,21 @@ def estadisticas_trabajador(request,trabajador_id):
 
     trabajador=get_object_or_404(Trabajador, id=trabajador_id)
     tareas=Patio.objects.filter(idOper1=trabajador_id)
+    periodo=request.GET.get('periodo')
+    hoy=date.today()
+    if periodo =='dia':
+        tareas=tareas.filter(fecha=hoy)
+    elif periodo == 'semana':
+      inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
+      tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)  # Filtrar tareas de la semana
 
+    elif periodo == 'mes':
+        tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
+        
     return render(request,'estadisticas_trabajador.html',{
         'trabajador':trabajador,
-        'tareas':tareas
+        'tareas':tareas,
+        
     })
 
 
@@ -248,7 +251,6 @@ def eliminar_alabarn(request, albaran_id):
     albaran = get_object_or_404(AlbaranDevolucion, id=albaran_id)
     albaran.delete()
     return redirect('listaAlbaranes')
-
 
 def eliminar_tarea(request,tarea_id):
     tarea=get_object_or_404(Patio,id=tarea_id)

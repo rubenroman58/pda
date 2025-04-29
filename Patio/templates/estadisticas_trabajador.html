@@ -55,8 +55,17 @@
     <div class="container">
         <div class="form-container">
             <h2>Estadisticas de {{trabajador.nombre}}</h2>
+            <form method="get">
+                <label for="periodo">Filtrar por:</label>
+                <select name="periodo" id="periodo">
+                    <option value="">Todo</option>
+                    <option value="dia">Dia</option>
+                    <option value="semana">Semana</option>
+                    <option value="mes">Mes</option>
+                </select>
+                <button type="submit">Aplicar</button>
+            </form>
                 <ul>
-                    <p>Filtrar por:</p>
                     {% for tarea in tareas %}
                     <li>
                        <a  href="{% url 'detalle_tarea' tarea.id %}">   Tarea ID: {{ tarea.id }}</a> - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
