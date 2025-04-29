@@ -61,7 +61,7 @@
             text-decoration: none;
             color: white;
             display: block;
-            background-color: grey;
+            background-color: gray;
             padding: 14px 20px;
             text-align: center;
             margin-top: 15px;
@@ -82,14 +82,17 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Numero</th>
+                        <th>Fecha</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for a in albaranesinfo %}
                     <tr>
-                        <td><a href="{% url 'detalle_albaran' albaran_id=a.id %}">{{ a.id }}</a></td>  
-                             <td>{{ a.Numero }}</td>  
+                        <td><a href="{% url 'detalle_albaran' a.id %}">{{ a.id }}</a></td>  
+                             <td>{{ a.numero }}</td>  
+                             <td>{{ a.fecha }}</td>  
                     </tr>
                     {% empty %}
                         <tr>

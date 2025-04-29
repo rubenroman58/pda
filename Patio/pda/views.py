@@ -220,7 +220,9 @@ def lista_albaranes_completa(request):
     albaranesinfo=[]
     for albaran in listaAlbaranes:
         albaraninfo={
-        'Numero': albaran.numero
+        'id':albaran.id,
+        'numero': albaran.numero,
+        'fecha':albaran.fecha
         }
         albaranesinfo.append(albaraninfo)
     return render (request,'lista_albaranes.html',{
@@ -229,11 +231,15 @@ def lista_albaranes_completa(request):
 
 def detalles_albaran(request,albaran_id):
     albaran=get_object_or_404(AlbaranDevolucion,id=albaran_id)
-    articulos=AlbaranDevolucion.objects.filter(albaran=albaran)
+    articulos=LineaArticulo.objects.filter(albaran=albaran)
     return render(request,'detalle_albaran.html',{
         'albaran':albaran,
         'articulos':articulos
     })
 
 def informacionIndek(request):
+
     return render(request,'informacionIndek.html')
+
+def tareasPorDia(request):
+    return

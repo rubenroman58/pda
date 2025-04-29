@@ -74,6 +74,32 @@
     </style>
 </head>
 <body>
-    dfbddfbdbddb
+    <h2>Detalles del albaran</h2>
+    <div class="container">
+        <div class="form-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id.Articulo</th>
+                        <th>Can.Buena</th>
+                        <th>Can.Mala</th>
+                        <th>Chatarra</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in articulos %}
+                    <tr>
+                        <td>{{a.id}}</td>
+                        <td>{{a.cantidad_buena}}</td>
+                        <td>{{a.cantidad_mala}}</td>
+                        <td>{{a.chatarra}}</td>
+                       
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>

@@ -56,6 +56,7 @@
         <div class="form-container">
             <h2>Estadisticas de {{trabajador.nombre}}</h2>
                 <ul>
+                    <p>Filtrar por:</p>
                     {% for tarea in tareas %}
                     <li>
                        <a  href="{% url 'detalle_tarea' tarea.id %}">   Tarea ID: {{ tarea.id }}</a> - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
