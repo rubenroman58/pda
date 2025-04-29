@@ -80,7 +80,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Id.Articulo</th>
+                        <th>Articulo</th>
                         <th>Can.Buena</th>
                         <th>Can.Mala</th>
                         <th>Chatarra</th>
@@ -90,16 +90,19 @@
                 <tbody>
                     {% for a in articulos %}
                     <tr>
-                        <td>{{a.id}}</td>
+                        <td>{{ a.nombre_articulo }}</td>
                         <td>{{a.cantidad_buena}}</td>
                         <td>{{a.cantidad_mala}}</td>
                         <td>{{a.chatarra}}</td>
-                       
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <a  href="{% url 'listaAlbaranes' %}"> Atrás</a> 
         </div>
     </div>
+
+    {{ articulos_dict|json_script:"articulos_data" }}
+
 </body>
 </html>

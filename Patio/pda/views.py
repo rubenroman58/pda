@@ -231,15 +231,28 @@ def lista_albaranes_completa(request):
 
 def detalles_albaran(request,albaran_id):
     albaran=get_object_or_404(AlbaranDevolucion,id=albaran_id)
-    articulos=LineaArticulo.objects.filter(albaran=albaran)
+    articulos=LineaArticulo.objects.filter(albaran=albaran) #Obtenemos las lineas asociadas al albaran
+    articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+    for linea in articulos:
+        linea.nombre_articulo=articulos_dict.get(linea.idArticulo)
     return render(request,'detalle_albaran.html',{
         'albaran':albaran,
-        'articulos':articulos
+        'articulos':articulos,
     })
 
 def informacionIndek(request):
 
     return render(request,'informacionIndek.html')
 
-def tareasPorDia(request):
-    return
+def eliminar_alabarn(request, albaran_id):
+    albaran = get_object_or_404(AlbaranDevolucion, id=albaran_id)
+    albaran.delete()
+    return redirect('listaAlbaranes')
+
+
+def eliminar_tarea(request,tarea_id):
+    tarea=get_object_or_404(Patio,id=tarea_id)
+    tarea.delete()
+    return redirect('listaTareas')
+
+    
