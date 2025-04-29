@@ -56,7 +56,7 @@
         <div class="form-container">
             <h2>Estadisticas de {{trabajador.nombre}}</h2>
             <form method="get">
-                <label for="periodo">Filtrar por:</label>
+                <label for="periodo"><strong>Filtrar por:</strong></label>
                 <select name="periodo" id="periodo">
                     <option value="">Todo</option>
                     <option value="dia">Dia</option>
@@ -65,6 +65,9 @@
                 </select>
                 <button type="submit">Aplicar</button>
             </form>
+            <strong>La horas totales trabajadas son: {{ tiempo_total }}</strong><br>
+            <strong>La cantidad total producida es: {{cantidad_total}}</strong><br>
+            <strong>Productividad promedio: {{productividad}}</strong>
                 <ul>
                     {% for tarea in tareas %}
                     <li>

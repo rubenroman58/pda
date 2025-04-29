@@ -190,9 +190,11 @@ def lista_tareas_completa(request):
 def detalles_tarea(request,tarea_id):
     tarea=get_object_or_404(Patio,id=tarea_id)
     paquetes=Paquete.objects.filter(tarea=tarea)
+    volver_url = request.META.get('HTTP_REFERER', '/lista_tareas/')
     return render(request,'detalle_tarea.html',{
         'tarea':tarea,
-        'paquetes':paquetes
+        'paquetes':paquetes,
+        'volver_url':volver_url
         })
 
 def estadisticas_trabajador(request,trabajador_id):
@@ -201,19 +203,60 @@ def estadisticas_trabajador(request,trabajador_id):
     tareas=Patio.objects.filter(idOper1=trabajador_id)
     periodo=request.GET.get('periodo')
     hoy=date.today()
+    cantidadTotal=0
+    tiempoTotalSegundos=0
+    productividad=0
+
+
+ 
+    for tarea in tareas:            
+            if tarea.horaInicio and tarea.horaFin:
+                fecha=tarea.fecha
+                hora_inicio=datetime.combine(fecha,tarea.horaInicio)
+                hora_fin=datetime.combine(fecha,tarea.horaFin)
+                tiempoSegundos = (hora_fin - hora_inicio).total_seconds()
+                tiempoTotalSegundos+= tiempoSegundos
+    horas = int(tiempoTotalSegundos // 3600)
+    minutos = int((tiempoTotalSegundos % 3600) // 60)
+    segundos = int(tiempoTotalSegundos % 60)
+
+    tiempoFinal = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+
+
+
     if periodo =='dia':
         tareas=tareas.filter(fecha=hoy)
+        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+        if tiempoTotalSegundos >0:
+            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
+        else:
+            productividad=0
     elif periodo == 'semana':
       inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
       tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)  # Filtrar tareas de la semana
-
+      cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+      if tiempoTotalSegundos >0:
+            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
+      else:
+            productividad=0
     elif periodo == 'mes':
         tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
-        
+        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+        if tiempoTotalSegundos >0:
+            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
+        else:
+            productividad=0
+    
+    
+   
+
+         
     return render(request,'estadisticas_trabajador.html',{
         'trabajador':trabajador,
         'tareas':tareas,
-        
+        'tiempo_total':tiempoFinal,
+        'cantidad_total':cantidadTotal,
+        'productividad':productividad
     })
 
 
