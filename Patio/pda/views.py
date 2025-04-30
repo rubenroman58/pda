@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from datetime import datetime,timedelta,date
-from django.db.models import Sum  
+from django.db.models import Sum,Q
 from django.shortcuts import get_object_or_404
 from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,TipoTarea,Trabajador,Articulo
 from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm,TrabajadorForm
-
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
 
 def iniciar_tarea(request):
     if request.method == 'POST':
@@ -111,7 +113,6 @@ def seleccionar_albaran(request):
     return render(request, 'seleccionar_albaran.html', {'form': form})
 def home (request): 
     return render(request,'index.html')
-
 def agregar_lineas(request,albaran_id):
     albaran = AlbaranDevolucion.objects.get(id=albaran_id)
     if request.method=='POST':
@@ -200,15 +201,17 @@ def detalles_tarea(request,tarea_id):
 def estadisticas_trabajador(request,trabajador_id):
 
     trabajador=get_object_or_404(Trabajador, id=trabajador_id)
-    tareas=Patio.objects.filter(idOper1=trabajador_id)
+    tareas=Patio.objects.filter(Q(idOper1=trabajador_id)| Q( idOper2=trabajador_id))
     periodo=request.GET.get('periodo')
     hoy=date.today()
     cantidadTotal=0
     tiempoTotalSegundos=0
     productividad=0
-
-
- 
+    numTareas=0
+    tiempoPromedio=0
+  
+  
+    
     for tarea in tareas:            
             if tarea.horaInicio and tarea.horaFin:
                 fecha=tarea.fecha
@@ -225,38 +228,97 @@ def estadisticas_trabajador(request,trabajador_id):
 
 
     if periodo =='dia':
+
         tareas=tareas.filter(fecha=hoy)
         cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+        numTareas=tareas.count()
+
+        
         if tiempoTotalSegundos >0:
             productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
         else:
             productividad=0
+
+        if numTareas > 0:
+            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
+            horas = int(tiempoPromedioSegundos // 3600)
+            minutos = int((tiempoPromedioSegundos % 3600) // 60)
+            segundos = int(tiempoPromedioSegundos % 60)
+            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+        else:
+            tiempoPromedio = "00:00:00"
+    
     elif periodo == 'semana':
+      
       inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
       tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)  # Filtrar tareas de la semana
       cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+      numTareas=tareas.count()
+   
       if tiempoTotalSegundos >0:
             productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
       else:
             productividad=0
+
+      if numTareas > 0:
+            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
+            horas = int(tiempoPromedioSegundos // 3600)
+            minutos = int((tiempoPromedioSegundos % 3600) // 60)
+            segundos = int(tiempoPromedioSegundos % 60)
+            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+      else:
+            tiempoPromedioTarea = "00:00:00"
+    
     elif periodo == 'mes':
+
         tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
         cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+        numTareas=tareas.count()
+        
+        
         if tiempoTotalSegundos >0:
             productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
         else:
             productividad=0
-    
-    
-   
+        
+        if numTareas > 0:
+            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
+            horas = int(tiempoPromedioSegundos // 3600)
+            minutos = int((tiempoPromedioSegundos % 3600) // 60)
+            segundos = int(tiempoPromedioSegundos % 60)
+            tiempoPromedioTarea = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+        else:
+            tiempoPromedioTarea = "00:00:00"
 
-         
+    elif periodo =='todo':
+
+        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
+        numTareas=tareas.count()
+        
+        
+        if tiempoTotalSegundos >0:
+            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
+        else:
+            productividad=0
+        
+        if numTareas > 0:
+            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
+            horas = int(tiempoPromedioSegundos // 3600)
+            minutos = int((tiempoPromedioSegundos % 3600) // 60)
+            segundos = int(tiempoPromedioSegundos % 60)
+            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+        else:
+            tiempoPromedio = "00:00:00"
+
+    
     return render(request,'estadisticas_trabajador.html',{
         'trabajador':trabajador,
         'tareas':tareas,
         'tiempo_total':tiempoFinal,
         'cantidad_total':cantidadTotal,
-        'productividad':productividad
+        'productividad':productividad,
+        'numTareas':numTareas,
+        'tiempoPromedio':tiempoPromedio
     })
 
 
@@ -300,4 +362,20 @@ def eliminar_tarea(request,tarea_id):
     tarea.delete()
     return redirect('listaTareas')
 
+@csrf_exempt 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            print('Login correcto')
+            return redirect('home')  # Esto depende de que la URL 'index' esté definida en tu URLconf
+        else:
+            print('Login fallido')
+            messages.error(request, 'Usuario o contraseña incorrecta')
+
+    return render(request, 'login.html')
     

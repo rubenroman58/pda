@@ -31,7 +31,7 @@
             overflow-x: auto;
         }
 
-      
+
         .aEnlac {
             text-decoration: none;
             color: white;
@@ -58,7 +58,7 @@
             <form method="get">
                 <label for="periodo"><strong>Filtrar por:</strong></label>
                 <select name="periodo" id="periodo">
-                    <option value="">Todo</option>
+                    <option value="todo">Todo</option>
                     <option value="dia">Dia</option>
                     <option value="semana">Semana</option>
                     <option value="mes">Mes</option>
@@ -67,19 +67,22 @@
             </form>
             <strong>La horas totales trabajadas son: {{ tiempo_total }}</strong><br>
             <strong>La cantidad total producida es: {{cantidad_total}}</strong><br>
-            <strong>Productividad promedio: {{productividad}}</strong>
-                <ul>
-                    {% for tarea in tareas %}
-                    <li>
-                       <a  href="{% url 'detalle_tarea' tarea.id %}">   Tarea ID: {{ tarea.id }}</a> - Fecha: {{ tarea.fecha }} - Cantidad: {{ tarea.cantidad }}
-                    </li>
-                    {% empty %}
-                    <p>No hay tareas registradas para este trabajador</p>
-                    {% endfor %}
+            <strong>Productividad promedio: {{productividad}}</strong><br>
+            <strong>Número de tareas realizadas: {{numTareas}}</strong><br>
+            <strong>El tiempo promedio por tarea es: {{tiempoPromedio}}</strong><br>
 
-                </ul>
+            <ul>
+                {% for tarea in tareas %}
+                <li>
+                    <a href="{% url 'detalle_tarea' tarea.id %}"> Tarea ID: {{ tarea.id }}</a> - Fecha: {{ tarea.fecha}} - Cantidad: {{ tarea.cantidad }}
+                </li>
+                {% empty %}
+                <p>No hay tareas registradas para este trabajador</p>
+                {% endfor %}
 
-                <a class="aEnlac"  href="/paginaInicial/">Volver al Inicio</a>
+            </ul>
+
+            <a class="aEnlac" href="/paginaInicial/">Volver al Inicio</a>
         </div>
     </div>
 </body>

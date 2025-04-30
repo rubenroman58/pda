@@ -1,6 +1,10 @@
 from django.db import models
 from django.utils import timezone
 
+class TipoTarea(models.Model):
+    nombre=models.TextField(null=True,blank=True)
+    def __str__(self):
+       return f"Id: {self.id}-Nombre: {self.nombre}"
 
 
 class Patio(models.Model):
@@ -30,7 +34,7 @@ class Paquete (models.Model):
 class AlbaranDevolucion(models.Model):
     numero=models.IntegerField(verbose_name='Num.Albaran', unique=True)
     fecha=models.DateField(default=timezone.localdate())
-   
+  
     def __str__(self):
         return f"El numero del albaran es {self.numero}, fecha:{self.fecha}"
     
@@ -43,10 +47,6 @@ class LineaArticulo(models.Model):
     def __str__(self):
        return f"Articulo {self.idArticulo} en albaran: {self.albaran}"
     
-class TipoTarea(models.Model):
-    nombre=models.TextField(null=True,blank=True)
-    def __str__(self):
-       return f"Id: {self.id}-Nombre: {self.nombre}"
 
 class Trabajador(models.Model):
     nombre=models.TextField(null=True,blank=True)
