@@ -1,21 +1,241 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inde-k</title>
+    <title>Encofrados Inde-K</title>
+    {% load static %}
     <style>
-        body{
-            background-color: lightslategray;
+        /* Reset de márgenes y rellenos */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        h2{
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(to right, #ff6600, #ffcc00);
+            color: white;
+            padding: 20px 0;
             text-align: center;
-            color: orange;
         }
-        </style>
-        
+
+        header .logo img {
+            width: 150px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        section {
+            padding: 40px;
+            margin: 20px auto;
+            max-width: 1000px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-background {
+            background-color: #333;
+            color: white;
+        }
+
+        .section-white {
+            background-color: #fff;
+            color: #333;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .product-list {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .product-item {
+            width: 30%;
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .product-item img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .product-item h3 {
+            color: #ff6600;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin: 5px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            margin-top: 30px;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Bienvenidos a Inde-k</h2>
+    <header>
+        <div class="logo">
+            <img src="{% static 'img/logo_indek.png' %}" alt="Encofrados Inde-K">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#historia">Historia</a></li>
+                <li><a href="#productos">Productos</a></li>
+                <li><a href="#expansion">Expansión</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="historia" class="section-background">
+        <div class="section-content">
+            <h2>Historia de Encofrados Inde-K</h2>
+            <p>Encofrados Inde-K nació en junio de 2000 con el objetivo de ofrecer soluciones innovadoras en el campo de
+                la construcción. Con una filosofía centrada en la calidad, eficiencia y seguridad, se ha posicionado
+                como una de las empresas líderes en su sector.</p>
+            <p>Gracias a su dedicación, Inde-K ha logrado cubrir más de 20 millones de metros cuadrados, destacándose
+                por su capacidad de adaptación a proyectos de gran envergadura tanto a nivel nacional como
+                internacional.</p>
+        </div>
+    </section>
+
+    <section id="productos" class="section-white">
+        <div class="section-content">
+            <h2>Productos</h2>
+            <p>En Encofrados Inde-K ofrecemos una amplia gama de productos especializados para la construcción, todos
+                ellos fabricados con la más alta calidad para garantizar la seguridad y eficiencia en cada proyecto.</p>
+            <div class="product-list">
+                <div class="product-item">
+                    <img src="{% static 'img/encofrado-mecano.png' %}" alt="Encofrado Mecano">
+                    <h3>Encofrado Mecano</h3>
+                    <p>Ideal para losas y estructuras horizontales, de fácil montaje y gran resistencia.</p>
+                </div>
+                <div class="product-item">
+                    <img src="{% static 'img/encofrado-vertical.png' %}" alt="Encofrado Vertical">
+                    <h3>Encofrado Vertical</h3>
+                    <p>Especial para la construcción de muros de hormigón, proporcionando precisión y estabilidad.</p>
+                </div>
+                <div class="product-item">
+                    <img src="{% static 'img/andamio.jpeg' %}" alt="Andamio Multidireccional">
+                    <h3>Andamio Multidireccional</h3>
+                    <p>Solución versátil para todo tipo de obra, adaptándose a cualquier tipo de estructura.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="expansion" class="section-white">
+        <div class="section-content">
+            <h2 style="text-align: center; color: #333;">Trayectoria y Valores de Inde-K</h2>
+            <div class="product-list">
+                <div class="product-item" style="background-color: white;">
+                    <img src="{% static 'img/expansion.jpg' %}" alt="Expansión Inde-K">
+                    <h3>EXPANSIÓN</h3>
+                    <h4 style="color: #ff6600;">SEGURIDAD</h4>
+                    <p>Las dos grandes premisas que deben concurrir en un sistema de encofrado son la <strong>resistencia</strong> y la <strong>seguridad</strong>. <strong>INDE-K</strong>, desde sus inicios, apostó por ello y lo pone de manifiesto en sus productos, los cuales superan con garantía el duro trato al que son sometidos en obra.</p>
+                </div>
+                <div class="product-item" style="background-color: white;">
+                    <img src="{% static 'img/indek2000-2014.jpg' %}" alt="INDE-K 2000 - 2014">
+                    <h3>INDE-K 2000 - 2014</h3>
+                    <h4 style="color: #ff6600;">VERSATILIDAD</h4>
+                    <p>Nuestro Dpto. Técnico explora todas las opciones hasta encontrar la solución más versátil. En encofrado de techos, a nuestro sistema <strong>VERSATEC</strong> esta condición le otorga, desde hace más de una década, el mayor reconocimiento y prestigio internacional. Con toda seguridad, el sistema más <strong>VERSÁTIL</strong> del MUNDO.</p>
+                </div>
+                <div class="product-item" style="background-color: white;">
+                    <img src="{% static 'img/experience.jpg' %}" alt="INDE-K EXPERIENCE">
+                    <h3>INDE-K EXPERIENCE</h3>
+                    <h4 style="color: #ff6600;">CALIDAD</h4>
+                    <p>Cada una de las piezas que componen los sistemas de encofrado de <strong>INDE-K</strong> han sido fabricadas siguiendo los más estrictos controles de calidad y siguiendo procesos robotizados guiados por personal con una cualificación específica para ello.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="section-white">
+        <div class="section-content">
+            <h2>Contacto</h2>
+            <p>Si necesitas más información o deseas ponerte en contacto con nosotros, puedes hacerlo a través de los
+                siguientes medios:</p>
+            <ul>
+                <li><strong>Teléfono:</strong> +34 123 456 789</li>
+                <li><strong>Email:</strong> <a href="mailto:info@indek.com">info@indek.com</a></li>
+                <li><strong>Dirección:</strong> Cam. los Cantos, 53, Campanillas, 29591 Málaga</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Encofrados Inde-K. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- JavaScript para interacción en títulos -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const productTitles = document.querySelectorAll('.product-item h3');
+
+            productTitles.forEach(title => {
+                title.addEventListener('mouseover', () => {
+                    const container = title.closest('.product-item');
+                    container.style.transition = 'background-color 0.3s';
+                    container.style.backgroundColor = '#ffe6cc';
+
+                    setTimeout(() => {
+                        container.style.backgroundColor = 'white';
+                    }, 800);
+                });
+            });
+        });
+    </script>
 </body>
+
 </html>
