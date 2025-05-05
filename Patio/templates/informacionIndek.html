@@ -7,7 +7,6 @@
     <title>Encofrados Inde-K</title>
     {% load static %}
     <style>
-        /* Reset de márgenes y rellenos */
         * {
             margin: 0;
             padding: 0;
@@ -19,6 +18,11 @@
             line-height: 1.6;
             background-color: #f4f4f4;
             color: #333;
+        }
+
+        p {
+            text-align: justify;
+            text-indent: 2em;
         }
 
         header {
@@ -120,6 +124,68 @@
             color: white;
             margin-top: 30px;
         }
+
+        .historia-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+            url("{% static 'img/imagen-historia.jpg' %}") center/cover no-repeat;
+            color: white;
+            padding: 60px 20px;
+            text-align: justify;
+        }
+
+        .historia-content {
+            max-width: 900px;
+            margin: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .historia-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ffcc00;
+        }
+
+
+        .typing {
+            overflow: hidden;
+            white-space: normal;
+            border-right: 3px solid #ffcc00;
+            animation: typing 5s steps(80, end), blink-caret 0.75s step-end infinite;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+
+        .typing-delay {
+            animation-delay: 3s;
+            animation-duration: 6s;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                border-color: transparent
+            }
+
+            50% {
+                border-color: #ffcc00
+            }
+        }
     </style>
 </head>
 
@@ -138,17 +204,18 @@
         </nav>
     </header>
 
-    <section id="historia" class="section-background">
-        <div class="section-content">
+    <section id="historia" class="historia-section">
+        <div class="historia-content">
             <h2>Historia de Encofrados Inde-K</h2>
-            <p>Encofrados Inde-K nació en junio de 2000 con el objetivo de ofrecer soluciones innovadoras en el campo de
-                la construcción. Con una filosofía centrada en la calidad, eficiencia y seguridad, se ha posicionado
-                como una de las empresas líderes en su sector.</p>
-            <p>Gracias a su dedicación, Inde-K ha logrado cubrir más de 20 millones de metros cuadrados, destacándose
-                por su capacidad de adaptación a proyectos de gran envergadura tanto a nivel nacional como
-                internacional.uuuuuuuu</p>
+            <p class="typing">Encofrados Inde-K nació en junio de 2000 con el objetivo de ofrecer soluciones innovadoras
+                en el campo de la construcción. Con una filosofía centrada en la calidad, eficiencia y seguridad, se ha
+                posicionado como una de las empresas líderes en su sector.</p>
+            <p class="typing typing-delay">Gracias a su dedicación, Inde-K ha logrado cubrir más de 20 millones de
+                metros cuadrados, destacándose por su capacidad de adaptación a proyectos de gran envergadura tanto a
+                nivel nacional como internacional.</p>
         </div>
     </section>
+
 
     <section id="productos" class="section-white">
         <div class="section-content">
@@ -183,19 +250,27 @@
                     <img src="{% static 'img/expansion.jpg' %}" alt="Expansión Inde-K">
                     <h3>EXPANSIÓN</h3>
                     <h4 style="color: #ff6600;">SEGURIDAD</h4>
-                    <p>Las dos grandes premisas que deben concurrir en un sistema de encofrado son la <strong>resistencia</strong> y la <strong>seguridad</strong>. <strong>INDE-K</strong>, desde sus inicios, apostó por ello y lo pone de manifiesto en sus productos, los cuales superan con garantía el duro trato al que son sometidos en obra.</p>
+                    <p>Las dos grandes premisas que deben concurrir en un sistema de encofrado son la
+                        <strong>resistencia</strong> y la <strong>seguridad</strong>. <strong>INDE-K</strong>, desde sus
+                        inicios, apostó por ello y lo pone de manifiesto en sus productos, los cuales superan con
+                        garantía el duro trato al que son sometidos en obra.</p>
                 </div>
                 <div class="product-item" style="background-color: white;">
                     <img src="{% static 'img/indek2000-2014.jpg' %}" alt="INDE-K 2000 - 2014">
-                    <h3>INDE-K 2000 - 2014</h3>
+                    <h3>INDE-K 2000 - 2025</h3>
                     <h4 style="color: #ff6600;">VERSATILIDAD</h4>
-                    <p>Nuestro Dpto. Técnico explora todas las opciones hasta encontrar la solución más versátil. En encofrado de techos, a nuestro sistema <strong>VERSATEC</strong> esta condición le otorga, desde hace más de una década, el mayor reconocimiento y prestigio internacional. Con toda seguridad, el sistema más <strong>VERSÁTIL</strong> del MUNDO.</p>
+                    <p>Nuestro Dpto. Técnico explora todas las opciones hasta encontrar la solución más versátil. En
+                        encofrado de techos, a nuestro sistema <strong>VERSATEC</strong> esta condición le otorga, desde
+                        hace más de una década, el mayor reconocimiento y prestigio internacional. Con toda seguridad,
+                        el sistema más <strong>VERSÁTIL</strong> del MUNDO.</p>
                 </div>
                 <div class="product-item" style="background-color: white;">
                     <img src="{% static 'img/experience.jpg' %}" alt="INDE-K EXPERIENCE">
                     <h3>INDE-K EXPERIENCE</h3>
                     <h4 style="color: #ff6600;">CALIDAD</h4>
-                    <p>Cada una de las piezas que componen los sistemas de encofrado de <strong>INDE-K</strong> han sido fabricadas siguiendo los más estrictos controles de calidad y siguiendo procesos robotizados guiados por personal con una cualificación específica para ello.</p>
+                    <p>Cada una de las piezas que componen los sistemas de encofrado de <strong>INDE-K</strong> han sido
+                        fabricadas siguiendo los más estrictos controles de calidad y siguiendo procesos robotizados
+                        guiados por personal con una cualificación específica para ello.</p>
                 </div>
             </div>
         </div>
@@ -207,7 +282,7 @@
             <p>Si necesitas más información o deseas ponerte en contacto con nosotros, puedes hacerlo a través de los
                 siguientes medios:</p>
             <ul>
-                <li><strong>Teléfono:</strong> +34 123 456 789</li>
+                <li><strong>Teléfono:</strong> +34 666 777 888</li>
                 <li><strong>Email:</strong> <a href="mailto:info@indek.com">info@indek.com</a></li>
                 <li><strong>Dirección:</strong> Cam. los Cantos, 53, Campanillas, 29591 Málaga</li>
             </ul>
@@ -215,13 +290,12 @@
     </section>
 
     <footer>
-        <p>&copy; 2025 Encofrados Inde-K. Todos los derechos reservados.</p>
+        <p style="text-align: center;">&copy; 2025 Encofrados Inde-K. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- JavaScript para interacción en títulos -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const productTitles = document.querySelectorAll('.product-item h3');
+            const productTitles = document.querySelectorAll('.product-item');
 
             productTitles.forEach(title => {
                 title.addEventListener('mouseover', () => {

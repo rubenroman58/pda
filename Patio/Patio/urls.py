@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import  admin
 from django.urls import path
-from pda.views import iniciar_tarea,login_view,eliminar_tarea,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
+from pda.views import iniciar_tarea,editar_linea_articulo,eliminar_linea_articulo,login_view,eliminar_tarea,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,6 +39,8 @@ urlpatterns = [
     path('informacionIndek/',informacionIndek, name='informacionIndek'),
     path('eliminar_albaran/<int:albaran_id>/',eliminar_alabarn,name='eliminarAlbaran'),
     path('eliminar_tarea/<int:tarea_id>/',eliminar_tarea,name='eliminarTarea'),
-   
+    path('editar_linea/<int:linea_id>/', editar_linea_articulo, name='editar_linea'),
+    path('eliminar_linea/<int:linea_id>/', eliminar_linea_articulo, name='eliminar_linea'),
+
 ]
 

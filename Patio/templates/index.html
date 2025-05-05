@@ -5,72 +5,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inde-k Pdas</title>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            background-color: lightgrey;
+            background: linear-gradient(45deg, #f3f3f3, #e8e8e8);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         h2 {
             text-align: center;
-            color: orange;
+            color: #ff6600;
             font-size: 40px;
+            margin-bottom: 30px;
         }
 
         .container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .btn {
-            background-color: grey;
+            background-color: rgb(250, 169, 18);
             color: white;
-            padding: 14px 20px;
-            border: 1px solid black;
-            border-radius: 2px;
+            padding: 14px 24px;
+            border-radius: 30px;
             cursor: pointer;
-            align-items: center;
-            width: 80px;
+            font-size: 18px;
             text-align: center;
             margin: 10px;
+            width: 200px;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
-            background-color: lightgray;
+            background-color: rgb(255, 186, 37);
+            transform: translateY(-5px);
+        }
 
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
         }
 
         a {
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon {
+            margin-right: 10px;
         }
     </style>
-
 </head>
 
 <body>
     <h2>Pdas Inde-k</h2>
-    <div class="container">
-        <a href="/iniciar_tarea/" class="btn">Nueva tarea</a>
-    </div>
-    <div class="container">
-        <a href="/lista_tareas/" class="btn">Lista Tareas</a>
-    </div>
 
     <div class="container">
-        <a href="/seleccionar_albaran/" class="btn">Albaranes Devolucion</a>
+        <a href="/iniciar_tarea/" class="btn"><i class="fas fa-play-circle icon"></i>Nueva tarea</a>
     </div>
     <div class="container">
-        <a href="/lista_albaranes/" class="btn">Lista Albaranes</a>
+        <a href="/lista_tareas/" class="btn"><i class="fas fa-list icon"></i>Lista Tareas</a>
     </div>
     <div class="container">
-        <a href="/estadisticas/" class="btn">Estadisticas</a>
+        <a href="/seleccionar_albaran/" class="btn"><i class="fas fa-archive icon"></i>Albaranes Devolución</a>
     </div>
     <div class="container">
-        <a href="/informacionIndek/" class="btn">Información Inde-k</a>
+        <a href="/lista_albaranes/" class="btn"><i class="fas fa-box icon"></i>Lista Albaranes</a>
     </div>
-
     <div class="container">
-        <a href="/" class="btn">Cerrar</a>
+        <a href="/estadisticas/" class="btn"><i class="fas fa-chart-bar icon"></i>Estadísticas</a>
+    </div>
+    <div class="container">
+        <a href="/informacionIndek/" class="btn"><i class="fas fa-info-circle icon"></i>Información Inde-k</a>
+    </div>
+    <div class="container">
+        <a href="/" class="btn"><i class="fas fa-sign-out-alt icon"></i>Cerrar</a>
     </div>
 
 </body>

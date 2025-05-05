@@ -4,63 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadisticas
-    </title>
+    <title>Estadísticas</title>
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
         body {
-            background-color: lightgrey;
+            background: linear-gradient(45deg, #f3f3f3, #e8e8e8);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         h3 {
             text-align: center;
-            color: orange;
+            color: #ff6600;
             font-size: 40px;
+            margin-bottom: 30px;
         }
 
         .container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .btn {
-            background-color: grey;
+            background-color:  rgb(250, 169, 18);
             color: white;
-            padding: 14px 20px;
-            border: 1px solid black;
-            border-radius: 2px;
+            padding: 14px 24px;
+            border: 1px solid  rgb(250, 169, 18);
+            border-radius: 30px;
             cursor: pointer;
-            align-items: center;
-            width: 80px;
+            font-size: 18px;
             text-align: center;
             margin: 10px;
+            width: 260px;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
-            background-color: lightgray;
+            background-color:  rgb(255, 186, 37);
+            transform: translateY(-5px);
+        }
 
+        .btn i {
+            margin-right: 8px;
         }
 
         a {
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
-
 </head>
 
 <body>
-    <h3>Estadisticas</h3>
+    <h3>Estadísticas</h3>
+
     <div class="container">
-        <a href="/estadisticasTrabajadores/" class="btn">Estadisticas trabajadores</a>
+        <a href="/estadisticasTrabajadores/" class="btn">
+            <i class="fas fa-users"></i>Estadísticas trabajadores
+        </a>
     </div>
 
     <div class="container">
-        <a href="/estadisticasAlbaranes/" class="btn">Estadisticas albaranes</a>
+        <a href="/estadisticasAlbaranes/" class="btn">
+            <i class="fas fa-clipboard-list"></i>Estadísticas albaranes
+        </a>
     </div>
 
     <div class="container">
-        <a href="/paginaInicial/" class="btn">Página Principal</a>
+        <a href="/paginaInicial/" class="btn">
+            <i class="fas fa-home"></i>Página principal
+        </a>
     </div>
-
 </body>
 
 </html>

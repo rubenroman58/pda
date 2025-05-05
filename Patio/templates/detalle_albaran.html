@@ -75,6 +75,7 @@
 </head>
 <body>
     <h2>Detalles del albaran</h2>
+    
     <div class="container">
         <div class="form-container">
             <table>
@@ -91,13 +92,19 @@
                     {% for a in articulos %}
                     <tr>
                         <td>{{ a.nombre_articulo }}</td>
-                        <td>{{a.cantidad_buena}}</td>
-                        <td>{{a.cantidad_mala}}</td>
-                        <td>{{a.chatarra}}</td>
+                        <td>{{ a.cantidad_buena }}</td>
+                        <td>{{ a.cantidad_mala }}</td>
+                        <td>{{ a.chatarra }}</td>
+                        <td>
+                            <a href="{% url 'editar_linea' a.id %}">Editar</a> |
+                            <a href="{% url 'eliminar_linea' a.id %}" onclick="return confirm('¿Estas seguro de que deseas eliminar esta linea?');">Eliminar</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
+                
             </table>
+            <a href="{% url 'agregar_lineas' albaran.id %}?volver_url={% url 'detalle_albaran' albaran.id %}">Añadir línea</a>
             <a  href="{% url 'listaAlbaranes' %}"> Atrás</a> 
         </div>
     </div>
