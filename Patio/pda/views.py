@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from datetime import datetime,timedelta,date
 from django.db.models import Sum,Q
 from django.shortcuts import get_object_or_404
@@ -113,47 +112,80 @@ def seleccionar_albaran(request):
     else:
         form = AlbaranForm()
     return render(request, 'seleccionar_albaran.html', {'form': form})
+
+
 def home (request): 
     return render(request,'index.html')
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
-from .models import AlbaranDevolucion, LineaArticulo, Articulo
-from .forms import LineaArticuloForm
 
-def agregar_lineas(request, albaran_id):
-    albaran = get_object_or_404(AlbaranDevolucion, id=albaran_id)
-
-    # Obtener la URL de la página anterior (HTTP_REFERER)
-    volver_url = request.META.get('HTTP_REFERER', reverse('listaAlbaranes'))  # URL por defecto si no se encuentra REFERER
-
-    # Si el método es POST (el formulario ha sido enviado)
-    if request.method == 'POST':
-        form = LineaArticuloForm(request.POST)
+def agregar_lineas(request,albaran_id):
+    albaran = AlbaranDevolucion.objects.get(id=albaran_id)
+    if request.method=='POST':
+        form=LineaArticuloForm(request.POST)
         if form.is_valid():
-            # Crear la línea del artículo
-            LineaArticulo.objects.create(
-                albaran=albaran,
-                idArticulo=form.cleaned_data['idArticulo'],
-                cantidad_buena=form.cleaned_data['cantidad_buena'],
-                cantidad_mala=form.cleaned_data['cantidad_mala'],
-                chatarra=form.cleaned_data['chatarra']
-            )
-            # Después de agregar, redirigir al usuario a la página de origen
-            return redirect(volver_url)  # Redirige a la página anterior
+         cantidad_buena= form.cleaned_data['cantidad_buena']
+         cantidad_mala= form.cleaned_data['cantidad_mala']
+         chatarra= form.cleaned_data['chatarra']
+         idArticulo= form.cleaned_data['idArticulo']
 
+         LineaArticulo.objects.create(
+             albaran=albaran,
+             idArticulo=idArticulo,
+             cantidad_buena=cantidad_buena,
+             chatarra=chatarra,
+             cantidad_mala=cantidad_mala
+         )
+         return redirect('agregar_lineas', albaran_id=albaran.id)
+        else:           
+            return render(request,'agregar_lineas.html',{
+                'form':form,
+                'albaran':albaran,
+                'articulos':{art.id: art.nombre for art in Articulo.objects.all()},
+            })
     else:
-        # Si no es un POST, mostramos el formulario vacío
         form = LineaArticuloForm()
+        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        return render(request, 'agregar_lineas.html', {
+            'form': form, 
+            'albaran': albaran,
+            'articulos':articulos_dict
+             })
+    
 
-    articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+def agregar_lineas2(request,albaran_id):
+    albaran = AlbaranDevolucion.objects.get(id=albaran_id)
+    if request.method=='POST':
+        form=LineaArticuloForm(request.POST)
+        if form.is_valid():
+         cantidad_buena= form.cleaned_data['cantidad_buena']
+         cantidad_mala= form.cleaned_data['cantidad_mala']
+         chatarra= form.cleaned_data['chatarra']
+         idArticulo= form.cleaned_data['idArticulo']
 
-    return render(request, 'agregar_lineas.html', {
-        'form': form,
-        'albaran': albaran,
-        'articulos': articulos_dict,
-        'volver_url': volver_url  # Pasa la URL a la plantilla
-    })
+         LineaArticulo.objects.create(
+             albaran=albaran,
+             idArticulo=idArticulo,
+             cantidad_buena=cantidad_buena,
+             chatarra=chatarra,
+             cantidad_mala=cantidad_mala
+         )
+         return redirect('añadir_linea', albaran_id=albaran.id)
+        else:           
+            return render(request,'añadir_linea.html',{
+                'form':form,
+                'albaran':albaran,
+                'articulos':{art.id: art.nombre for art in Articulo.objects.all()},
+            })
+    else:
+        form = LineaArticuloForm()
+        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        return render(request, 'añadir_linea.html', {
+            'form': form, 
+            'albaran': albaran,
+            'articulos':articulos_dict
+             })
+    
+
 
 def salir(request):
     return render(request,'cerrar_programa.html')
