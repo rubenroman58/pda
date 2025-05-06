@@ -18,7 +18,6 @@ def iniciar_tarea(request):
             tarea.horaInicio = datetime.now().time().replace(microsecond=0)  
             tarea.save()  
 
-        
             return redirect('crear_paquete', tarea_id=tarea.id)  
     else:
         form = PatioForm()
@@ -169,7 +168,7 @@ def agregar_lineas2(request,albaran_id):
              chatarra=chatarra,
              cantidad_mala=cantidad_mala
          )
-         return redirect('añadir_linea', albaran_id=albaran.id)
+         return redirect('añadir_lineas', albaran_id=albaran.id)
         else:           
             return render(request,'añadir_linea.html',{
                 'form':form,
