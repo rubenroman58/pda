@@ -116,7 +116,7 @@ class VistaTest(TestCase):
         self.assertEqual(paquete.cantidad_paquete, 5)
 
 
-                #---------------PRUEBAS DE INTEGRACIÓN----------------#
+            #----------------PRUEBAS DE INTEGRACIÓN----------------#
 
 
     class IntegracionTest(TestCase):

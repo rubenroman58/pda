@@ -67,7 +67,7 @@
             </form>
             <strong>La horas totales trabajadas son: {{ tiempo_total }}</strong><br>
             <strong>La cantidad total producida es: {{cantidad_total}}</strong><br>
-            <strong>Productividad promedio: {{productividad}}</strong><br>
+            <strong>Productividad promedio(unidad/horas): {{productividad}}</strong><br>
             <strong>Número de tareas realizadas: {{numTareas}}</strong><br>
             <strong>El tiempo promedio por tarea es: {{tiempoPromedio}}</strong><br>
 
@@ -79,7 +79,6 @@
                 {% empty %}
                 <p>No hay tareas registradas para este trabajador</p>
                 {% endfor %}
-
             </ul>
 
             <a class="aEnlac" href="/paginaInicial/">Volver al Inicio</a>
