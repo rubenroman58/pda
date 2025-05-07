@@ -196,13 +196,8 @@ def estadisticas(request):
 def lista_trabajadores(request):
     trabajadores=Trabajador.objects.all()
 
-    trabajadores_lista=[]
-    for tra in trabajadores:
-        trabajador_lista={
-           'id':tra.id,
-           'nombre':tra.nombre
-        }
-        trabajadores_lista.append(trabajador_lista)
+    trabajadores_lista = [{'id': tra.id, 'nombre': tra.nombre} for tra in trabajadores]
+
 
     return render(request,'lista_trabajadores.html',
                    {
