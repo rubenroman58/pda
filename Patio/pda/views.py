@@ -449,6 +449,7 @@ def eliminar_linea_articulo(request, linea_id):
     linea.delete()
     return redirect('detalle_albaran', albaran_id=albaran_id)
 
+
 def exportar_trabajadores_excel(request):
    wb=Workbook()
    ws=wb.active
