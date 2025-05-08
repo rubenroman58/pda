@@ -16,14 +16,14 @@ Including another URLconf
 """
 from django.contrib import  admin
 from django.urls import path
-from pda.views import iniciar_tarea,editar_linea_articulo,eliminar_linea_articulo,login_view,eliminar_tarea,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas,agregar_lineas,crear_paquete,home,salir,finalizar_tarea,seleccionar_albaran,agregar_lineas2
-
+from pda.views import login_view,eliminar_tarea,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas
+from pda.views import iniciar_tarea,exportar_trabajadores_excel,editar_linea_articulo,eliminar_linea_articulo,HomeView,salir,finalizar_tarea,seleccionar_albaran,agregar_lineas2,agregar_lineas,crear_paquete
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('iniciar-tarea/', iniciar_tarea, name='iniciar_tarea'),
     path('crear-paquete/<int:tarea_id>/', crear_paquete, name='crear_paquete'),
     path('',login_view,name='login'),
-    path('paginaInicial/',home,name='home'),
+    path('paginaInicial/',HomeView.as_view(),name='home'),
     path('cerrar_programa/',salir),
     path('iniciar_tarea/',iniciar_tarea),
     path('finalizar-tarea/<int:tarea_id>/', finalizar_tarea, name='finalizar_tarea'),
@@ -41,6 +41,7 @@ urlpatterns = [
     path('eliminar_tarea/<int:tarea_id>/',eliminar_tarea,name='eliminarTarea'),
     path('editar_linea/<int:linea_id>/', editar_linea_articulo, name='editar_linea'),
     path('eliminar_linea/<int:linea_id>/', eliminar_linea_articulo, name='eliminar_linea'),
-    path('añadir_linea/<int:albaran_id>/',agregar_lineas2,name='añadir_lineas')
+    path('añadir_linea/<int:albaran_id>/',agregar_lineas2,name='añadir_lineas'),
+    path('exportar-trabajadores/',exportar_trabajadores_excel,name='exportar_trabajadores')
 ]
 

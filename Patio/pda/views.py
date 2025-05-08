@@ -7,7 +7,11 @@ from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticulo
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
-from django.forms import modelformset_factory
+from django.views.generic import TemplateView
+from openpyxl import Workbook
+from django.http import HttpResponse
+from .utils import get_articulos_dict,get_tipos_tarea_dict,get_trabajadores_dict
+
 
 def iniciar_tarea(request):
     if request.method == 'POST':
@@ -18,18 +22,19 @@ def iniciar_tarea(request):
             tarea.horaInicio = datetime.now().time().replace(microsecond=0)  
             tarea.save()  
 
-            return redirect('crear_paquete', tarea_id=tarea.id)  
+            return redirect('crear_paquete', tarea_id=tarea.id)
     else:
         form = PatioForm()
 
-    trabajadores_dict = {trab.id: trab.nombre for trab in Trabajador.objects.all()}
-    tipos_tarea_dict = {tipo.id: tipo.nombre for tipo in TipoTarea.objects.all()}
+    trabajadores_dict = get_trabajadores_dict()
+    tipos_tarea_dict = get_tipos_tarea_dict()
 
     return render(request, 'iniciar_tarea.html', {
         'form': form,
         'trabajadores': trabajadores_dict,
         'tipos_tarea': tipos_tarea_dict,
     })
+
 
 def crear_paquete(request, tarea_id):
     tarea = get_object_or_404(Patio, id=tarea_id)
@@ -77,7 +82,7 @@ def crear_paquete(request, tarea_id):
         else:
             # Si el formulario no es válido, asegúrate de devolver una respuesta
             # En este caso, simplemente renderizamos el formulario con los errores
-            articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+            articulos_dict = get_articulos_dict()
             return render(request, 'crear_paquete.html', {
                 'form': form,
                 'tarea': tarea,
@@ -85,18 +90,20 @@ def crear_paquete(request, tarea_id):
             })
     else:
         form = PaqueteForm()
-        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        articulos_dict = get_articulos_dict()
         return render(request, 'crear_paquete.html', {
             'form': form,
             'tarea': tarea,
             'articulos': articulos_dict,
         })
 
+
 def finalizar_tarea(request, tarea_id):
     tarea = get_object_or_404(Patio, id=tarea_id)
     tarea.horaFin = datetime.now().time().replace(microsecond=0)  
     tarea.save()
     return redirect('iniciar_tarea') 
+
 
 def seleccionar_albaran(request):
     if request.method == 'POST':
@@ -113,8 +120,8 @@ def seleccionar_albaran(request):
     return render(request, 'seleccionar_albaran.html', {'form': form})
 
 
-def home (request): 
-    return render(request,'index.html')
+class HomeView (TemplateView): 
+    template_name='index.html'
 
 
 def agregar_lineas(request,albaran_id):
@@ -139,11 +146,11 @@ def agregar_lineas(request,albaran_id):
             return render(request,'agregar_lineas.html',{
                 'form':form,
                 'albaran':albaran,
-                'articulos':{art.id: art.nombre for art in Articulo.objects.all()},
+                'articulos':get_articulos_dict(),
             })
     else:
         form = LineaArticuloForm()
-        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        articulos_dict = get_articulos_dict()
         return render(request, 'agregar_lineas.html', {
             'form': form, 
             'albaran': albaran,
@@ -173,36 +180,31 @@ def agregar_lineas2(request,albaran_id):
             return render(request,'añadir_linea.html',{
                 'form':form,
                 'albaran':albaran,
-                'articulos':{art.id: art.nombre for art in Articulo.objects.all()},
+                'articulos':get_articulos_dict(),
             })
     else:
         form = LineaArticuloForm()
-        articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+        articulos_dict = get_articulos_dict()
         return render(request, 'añadir_linea.html', {
             'form': form, 
             'albaran': albaran,
             'articulos':articulos_dict
              })
-    
 
 
 def salir(request):
     return render(request,'cerrar_programa.html')
 
+
 def estadisticas(request):
 
     return render(request,'estadisticas.html')
 
+
 def lista_trabajadores(request):
-    trabajadores=Trabajador.objects.all()
+    trabajadores = Trabajador.objects.all()
+    return render(request, 'lista_trabajadores.html', {'trabajadores_lista': trabajadores})
 
-    trabajadores_lista = [{'id': tra.id, 'nombre': tra.nombre} for tra in trabajadores]
-
-
-    return render(request,'lista_trabajadores.html',
-                   {
-                       'trabajadores_lista':trabajadores_lista
-                   })
 
 def lista_tareas_completa(request):
     tareas = Patio.objects.all().order_by('-fecha')
@@ -224,6 +226,8 @@ def lista_tareas_completa(request):
     return render(request, 'lista_tareas.html', {
         'tareas_info': tareas_info
     })
+
+
 def detalles_tarea(request,tarea_id):
     tarea=get_object_or_404(Patio,id=tarea_id)
     paquetes=Paquete.objects.filter(tarea=tarea)
@@ -233,6 +237,7 @@ def detalles_tarea(request,tarea_id):
         'paquetes':paquetes,
         'volver_url':volver_url
         })
+
 
 def estadisticas_trabajador(request,trabajador_id):
 
@@ -373,10 +378,11 @@ def lista_albaranes_completa(request):
         'albaranesinfo':albaranesinfo
     }) 
 
+
 def detalles_albaran(request,albaran_id):
     albaran=get_object_or_404(AlbaranDevolucion,id=albaran_id)
     articulos=LineaArticulo.objects.filter(albaran=albaran) #Obtenemos las lineas asociadas al albaran
-    articulos_dict = {art.id: art.nombre for art in Articulo.objects.all()}
+    articulos_dict = get_articulos_dict()
     for linea in articulos:
         linea.nombre_articulo=articulos_dict.get(linea.idArticulo)
     return render(request,'detalle_albaran.html',{
@@ -384,14 +390,17 @@ def detalles_albaran(request,albaran_id):
         'articulos':articulos,
     })
 
+
 def informacionIndek(request):
 
     return render(request,'informacionIndek.html')
+
 
 def eliminar_alabarn(request, albaran_id):
     albaran = get_object_or_404(AlbaranDevolucion, id=albaran_id)
     albaran.delete()
     return redirect('listaAlbaranes')
+
 
 def eliminar_tarea(request,tarea_id):
     tarea=get_object_or_404(Patio,id=tarea_id)
@@ -414,6 +423,7 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrecta')
 
     return render(request, 'login.html')
+ 
     
 def editar_linea_articulo(request, linea_id):
     linea = get_object_or_404(LineaArticulo, id=linea_id)
@@ -438,3 +448,18 @@ def eliminar_linea_articulo(request, linea_id):
     albaran_id = linea.albaran.id
     linea.delete()
     return redirect('detalle_albaran', albaran_id=albaran_id)
+
+def exportar_trabajadores_excel(request):
+   wb=Workbook()
+   ws=wb.active
+   ws.title='Trabajadores'
+   ws.append(['Id','Nombre'])
+
+   for trabajador in Trabajador.objects.all():
+       ws.append([trabajador.id,trabajador.nombre])
+
+
+   response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+   response['Content-Disposition'] = 'attachment; filename=trabajadores.xlsx'
+   wb.save(response)
+   return response

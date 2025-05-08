@@ -32,11 +32,6 @@
             background-color: lightgray;
         }
 
-        a {
-            text-decoration: none;
-            color: white;
-        }
-
         .container {
             display: flex;
             justify-content: center;
@@ -122,7 +117,9 @@
             <a href="/seleccionar_albaran/">Volver a Seleccionar Albaran</a>
         </div>
     </div>
+    
     {{articulos|json_script:"articulos_data"}}
+
     <script>
         const articulo = JSON.parse(document.getElementById('articulos_data').textContent)
         document.getElementById('id_idArticulo').addEventListener('input', function () {

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Patio,Trabajador, Paquete,AlbaranDevolucion,LineaArticulo,Trabajador,Articulo,TipoTarea
+from .models import Patio,Trabajador, Paquete,AlbaranDevolucion,LineaArticulo,Articulo,TipoTarea
 
 class TrabajadorForm(forms.ModelForm):
     nombre=forms.CharField(label='Trabajador')
@@ -31,10 +31,10 @@ class PatioForm(forms.ModelForm):
             raise forms.ValidationError('El ID del trabajador 1 no es valido')
         
         if oper2 and not Trabajador.objects.filter(id=oper2).exists():
-            raise forms.ValidationError('El ID del trabajador 2 no es valido')
+            raise forms.ValidationError('El ID del trabajador 2 no es válido')
         
         if not TipoTarea.objects.filter(id=tip_tarea).exists():
-            raise forms.ValidationError('El ID del tipo de tarea no es valido')
+            raise forms.ValidationError('El ID del tipo de tarea no es válido')
         return cleaned_data
 
 class PaqueteForm(forms.ModelForm):
@@ -49,7 +49,7 @@ class PaqueteForm(forms.ModelForm):
         cleaned_data = super().clean()
         idTipArticulo=cleaned_data.get('idTipArticulo')
         if not Articulo.objects.filter(id=idTipArticulo).exists():
-            raise forms.ValidationError('El ID del articulo no es valido')
+            raise forms.ValidationError('El ID del artículo no es válido')
         
         return cleaned_data
 
@@ -70,7 +70,7 @@ class LineaArticuloForm(forms.ModelForm):
         cleaned_data=super().clean()
         idArticulo=cleaned_data.get('idArticulo')
         if not Articulo.objects.filter(id=idArticulo).exists():
-            raise forms.ValidationError('El Id del articulo es invalido')
+            raise forms.ValidationError('El Id del artículo es inválido')
         return cleaned_data
     
     class Meta:
