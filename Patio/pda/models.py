@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 class TipoTarea(models.Model):
+    cod_tarea=models.TextField(null=True,blank=True)
     nombre=models.TextField(null=True,blank=True)
     def __str__(self):
        return f"Id: {self.id}-Nombre: {self.nombre}"
@@ -50,8 +51,9 @@ class LineaArticulo(models.Model):
 
 class Trabajador(models.Model):
     nombre=models.TextField(null=True,blank=True)
+    apellidos=models.TextField(null=True,blank=True)
     def __str__(self):
-       return f"Id: {self.id}-Nombre: {self.nombre}"
+       return f"Id: {self.id}-Nombre: {self.nombre}-Apellidos:{self.apellidos}"
     
 class Articulo(models.Model):
     nombre=models.TextField(null=True,blank=True)

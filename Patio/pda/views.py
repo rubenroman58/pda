@@ -250,7 +250,7 @@ def estadisticas_trabajador(request,trabajador_id):
     productividad=0
     numTareas=0
     tiempoPromedio=0
-  
+    tipo_tareas_estadisticas={}
   
     
     for tarea in tareas:            
@@ -260,6 +260,7 @@ def estadisticas_trabajador(request,trabajador_id):
                 hora_fin=datetime.combine(fecha,tarea.horaFin)
                 tiempoSegundos = (hora_fin - hora_inicio).total_seconds()
                 tiempoTotalSegundos+= tiempoSegundos
+                
     horas = int(tiempoTotalSegundos // 3600)
     minutos = int((tiempoTotalSegundos % 3600) // 60)
     segundos = int(tiempoTotalSegundos % 60)
