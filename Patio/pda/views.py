@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 from openpyxl import Workbook
 from django.http import HttpResponse
 from .utils import get_articulos_dict,get_tipos_tarea_dict,get_trabajadores_dict
+from collections import defaultdict
 
 
 def iniciar_tarea(request):
@@ -239,128 +240,89 @@ def detalles_tarea(request,tarea_id):
         })
 
 
-def estadisticas_trabajador(request,trabajador_id):
-
-    trabajador=get_object_or_404(Trabajador, id=trabajador_id)
-    tareas=Patio.objects.filter(Q(idOper1=trabajador_id)| Q( idOper2=trabajador_id))
-    periodo=request.GET.get('periodo')
-    hoy=date.today()
-    cantidadTotal=0
-    tiempoTotalSegundos=0
-    productividad=0
-    numTareas=0
-    tiempoPromedio=0
-    tipo_tareas_estadisticas={}
-  
+def estadisticas_trabajador(request, trabajador_id):
+    trabajador = get_object_or_404(Trabajador, id=trabajador_id)
+    tareas = Patio.objects.filter(Q(idOper1=trabajador_id) | Q(idOper2=trabajador_id))
     
-    for tarea in tareas:            
-            if tarea.horaInicio and tarea.horaFin:
-                fecha=tarea.fecha
-                hora_inicio=datetime.combine(fecha,tarea.horaInicio)
-                hora_fin=datetime.combine(fecha,tarea.horaFin)
-                tiempoSegundos = (hora_fin - hora_inicio).total_seconds()
-                tiempoTotalSegundos+= tiempoSegundos
-                
-    horas = int(tiempoTotalSegundos // 3600)
-    minutos = int((tiempoTotalSegundos % 3600) // 60)
-    segundos = int(tiempoTotalSegundos % 60)
-
-    tiempoFinal = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-
-
-
-    if periodo =='dia':
-
-        tareas=tareas.filter(fecha=hoy)
-        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
-        numTareas=tareas.count()
-
-        
-        if tiempoTotalSegundos >0:
-            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
-        else:
-            productividad=0
-
-        if numTareas > 0:
-            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
-            horas = int(tiempoPromedioSegundos // 3600)
-            minutos = int((tiempoPromedioSegundos % 3600) // 60)
-            segundos = int(tiempoPromedioSegundos % 60)
-            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-        else:
-            tiempoPromedio = "00:00:00"
+    # Obtener el periodo de la query string (día, semana, mes, todo)
+    periodo = request.GET.get('periodo')
+    hoy = date.today()
     
+    # Variables generales
+    cantidadTotal = 0
+    tiempoTotalSegundos = 0
+    productividad = 0
+    numTareas = 0
+    tiempoPromedio = "00:00:00"
+    
+    # Diccionario para almacenar estadísticas por tipo de tarea
+    estadisticas_por_tipo = defaultdict(lambda: {
+        'cantidad': 0,
+        'tiempo_total': 0,
+        'num_tareas': 0,
+        'tareas': []
+    })
+    
+    # Filtrar tareas según el periodo
+    if periodo == 'dia':
+        tareas = tareas.filter(fecha=hoy)
     elif periodo == 'semana':
-      
-      inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
-      tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)  # Filtrar tareas de la semana
-      cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
-      numTareas=tareas.count()
-   
-      if tiempoTotalSegundos >0:
-            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
-      else:
-            productividad=0
-
-      if numTareas > 0:
-            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
-            horas = int(tiempoPromedioSegundos // 3600)
-            minutos = int((tiempoPromedioSegundos % 3600) // 60)
-            segundos = int(tiempoPromedioSegundos % 60)
-            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-      else:
-            tiempoPromedioTarea = "00:00:00"
-    
+        inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
+        tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)
     elif periodo == 'mes':
-
         tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
-        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
-        numTareas=tareas.count()
-        
-        
-        if tiempoTotalSegundos >0:
-            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
-        else:
-            productividad=0
-        
-        if numTareas > 0:
-            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
-            horas = int(tiempoPromedioSegundos // 3600)
-            minutos = int((tiempoPromedioSegundos % 3600) // 60)
-            segundos = int(tiempoPromedioSegundos % 60)
-            tiempoPromedioTarea = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-        else:
-            tiempoPromedioTarea = "00:00:00"
+    elif periodo == 'todo':
+        pass  # No filtra, usa todas las tareas
 
-    elif periodo =='todo':
+    # Agrupar las tareas por tipo
+    for tarea in tareas:
+        if tarea.horaInicio and tarea.horaFin and tarea.idTipTarea is not None:
+            try:
+                tipo_tarea = TipoTarea.objects.get(id=tarea.idTipTarea)
+                nombre_tarea = tipo_tarea.nombre
+            except TipoTarea.DoesNotExist:
+                nombre_tarea = f"Tarea ID {tarea.idTipTarea}"
 
-        cantidadTotal=sum(tarea.cantidad or 0 for tarea in tareas)
-        numTareas=tareas.count()
-        
-        
-        if tiempoTotalSegundos >0:
-            productividad=round(cantidadTotal/(tiempoTotalSegundos/3600),2)
-        else:
-            productividad=0
-        
-        if numTareas > 0:
-            tiempoPromedioSegundos = tiempoTotalSegundos / numTareas
-            horas = int(tiempoPromedioSegundos // 3600)
-            minutos = int((tiempoPromedioSegundos % 3600) // 60)
-            segundos = int(tiempoPromedioSegundos % 60)
-            tiempoPromedio = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-        else:
-            tiempoPromedio = "00:00:00"
+            # Calcular tiempo de la tarea
+            fecha = tarea.fecha
+            hora_inicio = datetime.combine(fecha, tarea.horaInicio)
+            hora_fin = datetime.combine(fecha, tarea.horaFin)
+            tiempo_segundos = (hora_fin - hora_inicio).total_seconds()
 
-    
-    return render(request,'estadisticas_trabajador.html',{
-        'trabajador':trabajador,
-        'tareas':tareas,
-        'tiempo_total':tiempoFinal,
-        'cantidad_total':cantidadTotal,
-        'productividad':productividad,
-        'numTareas':numTareas,
-        'tiempoPromedio':tiempoPromedio
+            # Acumular estadísticas por tipo de tarea
+            estadisticas_por_tipo[nombre_tarea]['cantidad'] += tarea.cantidad or 0
+            estadisticas_por_tipo[nombre_tarea]['tiempo_total'] += tiempo_segundos
+            estadisticas_por_tipo[nombre_tarea]['num_tareas'] += 1
+            estadisticas_por_tipo[nombre_tarea]['tareas'].append(tarea)
+
+    # Calcular productividad y tiempo promedio
+    for nombre_tarea, datos in estadisticas_por_tipo.items():
+        tiempo_total = datos['tiempo_total']
+        num_tareas = datos['num_tareas']
+        cantidad = datos['cantidad']
+
+        # Calcular productividad (cantidad por hora)
+        if tiempo_total > 0:
+            datos['productividad'] = round(cantidad / (tiempo_total / 3600), 2)
+        else:
+            datos['productividad'] = 0
+
+        # Calcular tiempo promedio por tarea
+        if num_tareas > 0:
+            tiempo_promedio = tiempo_total / num_tareas
+            h = int(tiempo_promedio // 3600)
+            m = int((tiempo_promedio % 3600) // 60)
+            s = int(tiempo_promedio % 60)
+            datos['tiempo_promedio'] = f"{h:02d}:{m:02d}:{s:02d}"
+        else:
+            datos['tiempo_promedio'] = "00:00:00"
+
+    # Preparar los datos para el template
+    return render(request, 'estadisticas_trabajador.html', {
+        'trabajador': trabajador,
+        'tareas': tareas,
+        'estadisticas_por_tipo': dict(estadisticas_por_tipo),
+        'periodo': periodo,
     })
 
 
@@ -452,6 +414,7 @@ def eliminar_linea_articulo(request, linea_id):
 
 
 def exportar_trabajadores_excel(request):
+   
    wb=Workbook()
    ws=wb.active
    ws.title='Trabajadores'
@@ -465,3 +428,62 @@ def exportar_trabajadores_excel(request):
    response['Content-Disposition'] = 'attachment; filename=trabajadores.xlsx'
    wb.save(response)
    return response
+
+
+def comparar_trabajadores(request):
+   trabajadores=Trabajador.objects.all()
+   hoy=date.today()
+   periodo=request.GET.get('periodo','todo')
+   comparativa=[]
+
+   for trabajador in trabajadores:
+       tareas=Patio.objects.filter(Q(idOper1=trabajador.id)|Q(idOper2=trabajador.id))
+
+       if periodo == 'dia':
+            tareas = tareas.filter(fecha=hoy)
+       elif periodo == 'semana':
+            inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
+            tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)
+       elif periodo == 'mes':
+            tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
+
+
+       tiempo_total=0
+       cantidad_total=0
+       num_tareas=0
+
+       for tarea in tareas:
+           if tarea.horaInicio and tarea.horaFin:
+               
+               hora_inicio = datetime.combine(tarea.fecha,tarea.horaInicio)
+               hora_fin = datetime.combine(tarea.fecha,tarea.horaFin)
+               tiempo_segundos = (hora_fin-hora_inicio).total_seconds()
+               tiempo_total += tiempo_segundos
+               cantidad_total += tarea.cantidad  or 0
+               num_tareas += 1
+            
+           if tiempo_total > 0:
+                productividad = round(cantidad_total/(tiempo_total/3600))
+           else:
+                productividad = 0
+                
+                
+           if num_tareas>0:
+               tiempo_promedio=tiempo_total/num_tareas
+               h = int(tiempo_promedio // 3600)
+               m = int((tiempo_promedio % 3600) // 60)
+               s = int(tiempo_promedio % 60)
+               tiempo_promedio = f"{h:02d}:{m:02d}:{s:02d}"
+           else:
+            tiempo_promedio = "00:00:00"
+            
+           comparativa.append({
+               'trabajador':trabajador,
+               'cantidad_total': cantidad_total,
+               'tiempo_total': tiempo_total,
+               'productividad': productividad,
+               'num_tareas': num_tareas,
+               'tiempo_promedio': tiempo_promedio, 
+           })
+
+   return  render(request,'comparar_trabajadores.html',{'comparativa':comparativa,'periodo':periodo})

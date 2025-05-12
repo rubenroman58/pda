@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class TipoTarea(models.Model):
     cod_tarea=models.TextField(null=True,blank=True)
     nombre=models.TextField(null=True,blank=True)
@@ -32,6 +33,7 @@ class Paquete (models.Model):
     def __str__(self):
         return f"Paquete de {self.cantidad_paquete} art. (Tarea #{self.tarea.id})"
     
+
 class AlbaranDevolucion(models.Model):
     numero=models.IntegerField(verbose_name='Num.Albaran', unique=True)
     fecha=models.DateField(default=timezone.localdate())
@@ -39,6 +41,7 @@ class AlbaranDevolucion(models.Model):
     def __str__(self):
         return f"El numero del albaran es {self.numero}, fecha:{self.fecha}"
     
+
 class LineaArticulo(models.Model):
     albaran = models.ForeignKey(AlbaranDevolucion, on_delete=models.CASCADE, related_name='lineas')
     idArticulo=models.IntegerField(null=True, blank=True)
@@ -54,6 +57,7 @@ class Trabajador(models.Model):
     apellidos=models.TextField(null=True,blank=True)
     def __str__(self):
        return f"Id: {self.id}-Nombre: {self.nombre}-Apellidos:{self.apellidos}"
+   
     
 class Articulo(models.Model):
     nombre=models.TextField(null=True,blank=True)

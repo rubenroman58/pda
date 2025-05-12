@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Comparativa de Trabajadores</h2>
+
+            <!-- Filtro por periodo -->
+            <form method="get">
+                <label for="periodo"><strong>Filtrar por:</strong></label>
+                <select name="periodo" id="periodo">
+                    <option value="todo" {% if periodo == 'todo' %}selected{% endif %}>Todo</option>
+                    <option value="dia" {% if periodo == 'dia' %}selected{% endif %}>Día</option>
+                    <option value="semana" {% if periodo == 'semana' %}selected{% endif %}>Semana</option>
+                    <option value="mes" {% if periodo == 'mes' %}selected{% endif %}>Mes</option>
+                </select>
+                <button type="submit">Aplicar</button>
+            </form>
+
+            <!-- Tabla comparativa de trabajadores -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trabajador</th>
+                        <th>Cantidad Total</th>
+                        <th>Tiempo Total (hrs)</th>
+                        <th>Productividad (unidades/hora)</th>
+                        <th>Número de Tareas</th>
+                        <th>Tiempo Promedio por Tarea</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in comparativa %}
+                        <tr>
+                            <td>{{ data.trabajador.nombre }}</td>
+                            <td>{{ data.cantidad_total }}</td>
+                            <td>{{ data.tiempo_total|floatformat:2 }}</td>
+                            <td>{{ data.productividad }}</td>
+                            <td>{{ data.num_tareas }}</td>
+                            <td>{{ data.tiempo_promedio }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">No se han encontrado tareas para el periodo seleccionado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a class="aEnlac" href="/paginaInicial/">Volver al Inicio</a>
+        </div>
+    </div>
+</body>
+
+</html>
