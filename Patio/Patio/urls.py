@@ -16,8 +16,8 @@ Including another URLconf
 """
 from django.contrib import  admin
 from django.urls import path
-from pda.views import login_view,eliminar_tarea,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas
-from pda.views import iniciar_tarea,exportar_trabajadores_excel,editar_linea_articulo,eliminar_linea_articulo,HomeView,salir,finalizar_tarea,seleccionar_albaran,agregar_lineas2,agregar_lineas,crear_paquete
+from pda.views import login_view,eliminar_tarea,informes,eliminar_alabarn,informacionIndek,detalles_albaran,lista_albaranes_completa,estadisticas_trabajador,detalles_tarea,lista_tareas_completa,lista_trabajadores,estadisticas
+from pda.views import comparativa_productividad,iniciar_tarea,exportar_trabajadores_excel,editar_linea_articulo,eliminar_linea_articulo,HomeView,salir,finalizar_tarea,seleccionar_albaran,agregar_lineas2,agregar_lineas,crear_paquete
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('iniciar-tarea/', iniciar_tarea, name='iniciar_tarea'),
@@ -42,6 +42,8 @@ urlpatterns = [
     path('editar_linea/<int:linea_id>/', editar_linea_articulo, name='editar_linea'),
     path('eliminar_linea/<int:linea_id>/', eliminar_linea_articulo, name='eliminar_linea'),
     path('añadir_linea/<int:albaran_id>/',agregar_lineas2,name='añadir_lineas'),
-    path('exportar-trabajadores/',exportar_trabajadores_excel,name='exportar_trabajadores')
+    path('exportar-trabajadores/',exportar_trabajadores_excel,name='exportar_trabajadores'),
+    path('estadisticas/comparativa/',comparativa_productividad, name='comparativa_productividad'),
+    path('informes/',informes,name='informes')
 ]
 

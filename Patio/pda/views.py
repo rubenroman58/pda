@@ -430,60 +430,68 @@ def exportar_trabajadores_excel(request):
    return response
 
 
-def comparar_trabajadores(request):
-   trabajadores=Trabajador.objects.all()
-   hoy=date.today()
-   periodo=request.GET.get('periodo','todo')
-   comparativa=[]
 
-   for trabajador in trabajadores:
-       tareas=Patio.objects.filter(Q(idOper1=trabajador.id)|Q(idOper2=trabajador.id))
+def comparativa_productividad(request):
 
-       if periodo == 'dia':
-            tareas = tareas.filter(fecha=hoy)
-       elif periodo == 'semana':
-            inicio_semana = hoy - timedelta(days=hoy.weekday())  # Primer día de la semana
-            tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)
-       elif periodo == 'mes':
-            tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
+    periodo = request.GET.get('periodo')
+    hoy = date.today()
 
+    # Obtener tareas según el periodo
+    tareas = Patio.objects.all()
+    if periodo == 'dia':
+        tareas = tareas.filter(fecha=hoy)
+    elif periodo == 'semana':
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
+        tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)
+    elif periodo == 'mes':
+        tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
 
-       tiempo_total=0
-       cantidad_total=0
-       num_tareas=0
+    # Diccionario para estadísticas
+    estadisticas_por_trabajador = defaultdict(lambda: {
+        'cantidad': 0,
+        'tiempo_total': 0,
+        'num_tareas': 0,
+        'productividad': 0,
+        'nombre': '',
+    })
 
-       for tarea in tareas:
-           if tarea.horaInicio and tarea.horaFin:
-               
-               hora_inicio = datetime.combine(tarea.fecha,tarea.horaInicio)
-               hora_fin = datetime.combine(tarea.fecha,tarea.horaFin)
-               tiempo_segundos = (hora_fin-hora_inicio).total_seconds()
-               tiempo_total += tiempo_segundos
-               cantidad_total += tarea.cantidad  or 0
-               num_tareas += 1
-            
-           if tiempo_total > 0:
-                productividad = round(cantidad_total/(tiempo_total/3600))
-           else:
-                productividad = 0
-                
-                
-           if num_tareas>0:
-               tiempo_promedio=tiempo_total/num_tareas
-               h = int(tiempo_promedio // 3600)
-               m = int((tiempo_promedio % 3600) // 60)
-               s = int(tiempo_promedio % 60)
-               tiempo_promedio = f"{h:02d}:{m:02d}:{s:02d}"
-           else:
-            tiempo_promedio = "00:00:00"
-            
-           comparativa.append({
-               'trabajador':trabajador,
-               'cantidad_total': cantidad_total,
-               'tiempo_total': tiempo_total,
-               'productividad': productividad,
-               'num_tareas': num_tareas,
-               'tiempo_promedio': tiempo_promedio, 
-           })
+    for tarea in tareas:
+        if tarea.horaInicio and tarea.horaFin:
+            hora_inicio = datetime.combine(tarea.fecha, tarea.horaInicio)
+            hora_fin = datetime.combine(tarea.fecha, tarea.horaFin)
+            tiempo_segundos = (hora_fin - hora_inicio).total_seconds()
 
-   return  render(request,'comparar_trabajadores.html',{'comparativa':comparativa,'periodo':periodo})
+            # Obtener los trabajadores por su ID
+            for operador_id in [tarea.idOper1, tarea.idOper2]:
+                if operador_id:
+                    # Buscar el trabajador correspondiente
+                    try:
+                        trabajador_obj = Trabajador.objects.get(id=operador_id)
+                        stats = estadisticas_por_trabajador[operador_id]
+                        stats['nombre'] = trabajador_obj.nombre
+                        stats['cantidad'] += tarea.cantidad or 0
+                        stats['tiempo_total'] += tiempo_segundos
+                        stats['num_tareas'] += 1
+                    except Trabajador.DoesNotExist:
+                        # Si no se encuentra el trabajador
+                        stats = estadisticas_por_trabajador[operador_id]
+                        stats['nombre'] = f'Operador ID {operador_id} no encontrado'
+
+    # Calcular productividad
+    for stats in estadisticas_por_trabajador.values():
+        if stats['tiempo_total'] > 0:
+           stats['productividad'] = round(stats['cantidad'] / (stats['tiempo_total'] / 3600), 2)
+
+    # Ordenar trabajadores por productividad
+    trabajadores_ordenados = sorted(estadisticas_por_trabajador.items(), key=lambda x: x[1]['productividad'], reverse=True)
+
+    return render(request, 'comparativa_productividad.html', {
+        'trabajadores': trabajadores_ordenados,
+        'periodo': periodo
+    })
+    
+    
+    
+def informes(request):
+    
+    return render(request,'informes.html')

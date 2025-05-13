@@ -1,13 +1,16 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ExportMixin
-from .models import Patio,Paquete,AlbaranDevolucion,LineaArticulo,Articulo,TipoTarea,Trabajador
+from .models import Patio,Paquete,Andalucia,Madrid,Levante,Cataluña,AlbaranDevolucion,LineaArticulo,Articulo,TipoTarea,Trabajador
 admin.site.register(Patio)
 admin.site.register(Paquete)
 admin.site.register(AlbaranDevolucion)
 admin.site.register(LineaArticulo)
 admin.site.register(Articulo)
-admin.site.register(TipoTarea)
+admin.site.register(Andalucia)
+admin.site.register(Madrid)
+admin.site.register(Levante)
+admin.site.register(Cataluña)
 
 # Define la clase Resource para el modelo Trabajador
 class TrabajadorResource(resources.ModelResource):

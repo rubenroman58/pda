@@ -63,4 +63,36 @@ class Articulo(models.Model):
     nombre=models.TextField(null=True,blank=True)
     def __str__(self):
        return f"Id: {self.id}-Nombre: {self.nombre}"
+   
+class Andalucia(models.Model):
+    articulo=models.ForeignKey(Articulo,on_delete=models.CASCADE,null=True,related_name='lineas_andalucia')
+    tot_unid=models.IntegerField(null=True,blank=True)                        
+    p_alq_medio=models.IntegerField(null=True,blank=True)
+    
+    def __str__(self):
+        return f"Tot.unid: {self.tot_unid}-P.Alq.Medio: {self.p_alq_medio}"
+    
+class Levante(models.Model):
+    articulo=models.ForeignKey(Articulo,on_delete=models.CASCADE,null=True,related_name='lineas_levante')
+    tot_unid=models.IntegerField(null=True,blank=True)                        
+    p_alq_medio=models.IntegerField(null=True,blank=True)
+    
+    def __str__(self):
+        return f"Tot.unid: {self.tot_unid}-P.Alq.Medio: {self.p_alq_medio}"
+        
+class Madrid(models.Model):
+    articulo=models.ForeignKey(Articulo,on_delete=models.CASCADE,null=True,related_name='lineas_madrid')
+    tot_unid=models.IntegerField(null=True,blank=True)                        
+    p_alq_medio=models.IntegerField(null=True,blank=True)
+    
+    def __str__(self):
+        return f"Tot.unid: {self.tot_unid}-P.Alq.Medio: {self.p_alq_medio}"
+    
 
+class Cataluña(models.Model):
+    articulo=models.ForeignKey(Articulo,on_delete=models.CASCADE,null=True,related_name='lineas_cataluña')
+    tot_unid=models.IntegerField(null=True,blank=True)
+    p_alq_medio=models.IntegerField(null=True,blank=True)
+    
+    def __str__(self):
+        return f"Tot.unid: {self.tot_unid}-P.Alq.Medio: {self.p_alq_medio}"

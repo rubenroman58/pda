@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparativa de Productividad</title>
+    <style>
+        body {
+            background-color: lightgrey;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+          a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            background-color: grey;
+            padding: 14px 20px;
+            text-align: center;
+            margin-top: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        a:hover {
+            background-color: lightgray;
+        }
+
+        h1 {
+            text-align: center;
+            color: orange;
+            font-size: 36px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons a {
+            text-decoration: none;
+            color: white;
+            background-color: grey;
+            padding: 12px 20px;
+            margin: 0 10px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        .filter-buttons a:hover,
+        .filter-buttons a.active {
+            background-color: orange;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background-color: grey;
+            padding: 12px 20px;
+            text-align: center;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: orange;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>Comparativa de productividad entre trabajadores</h1>
+
+    <div class="filter-buttons">
+        <a href="?periodo=dia" class="{% if periodo == 'dia' %}active{% endif %}">Hoy</a>
+        <a href="?periodo=semana" class="{% if periodo == 'semana' %}active{% endif %}">Semana</a>
+        <a href="?periodo=mes" class="{% if periodo == 'mes' %}active{% endif %}">Mes</a>
+        <a href="?periodo=todo" class="{% if periodo == 'todo' or not periodo %}active{% endif %}">Todo</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Trabajador</th>
+                <th>Total de Paquetes</th>
+                <th>Nº de Tareas</th>
+                <th>Tiempo Total (HH:MM:SS)</th>
+                <th>Productividad (paquetes/hora)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trabajador_id, stats in trabajadores %}
+                <tr>
+                    <td>{{ stats.nombre }}</td>
+                    <td>{{ stats.cantidad }}</td>
+                    <td>{{ stats.num_tareas }}</td>
+                    <td>
+                        {% with total=stats.tiempo_total %}
+                            {% with h=total|divisibleby:3600 m=total|divisibleby:60 %}
+                                {{ total|floatformat:0|divisibleby:3600|floatformat:0 }}h
+                            {% endwith %}
+                        {% endwith %}
+                    </td>
+                    <td>{{ stats.productividad }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No hay tareas para mostrar en este período.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/paginaInicial/" class="btn">Página Principal</a>
+</body>
+
+</html>
