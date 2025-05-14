@@ -12,7 +12,8 @@ from openpyxl import Workbook
 from django.http import HttpResponse
 from .utils import get_articulos_dict,get_tipos_tarea_dict,get_trabajadores_dict
 from collections import defaultdict
-
+from pda.models import Articulo, Andalucia, Levante, Madrid, Cataluña
+import pandas as pd
 
 def iniciar_tarea(request):
     if request.method == 'POST':
@@ -490,8 +491,68 @@ def comparativa_productividad(request):
         'periodo': periodo
     })
     
-    
-    
-def informes(request):
-    
-    return render(request,'informes.html')
+from io import BytesIO
+
+def exportar_datos(request): 
+    delegaciones = ['Andalucia', 'Levante', 'Madrid', 'Cataluña']
+    resultados = []
+
+    for articulo in Articulo.objects.all():
+        nombre_articulo = articulo.nombre
+        fila = [articulo.id, nombre_articulo]
+        totales_facturacion = {}
+
+        for delegacion in delegaciones:
+            if delegacion == 'Andalucia':
+                data = Andalucia.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Levante':
+                data = Levante.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Madrid':
+                data = Madrid.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Cataluña':
+                data = Cataluña.objects.filter(articulo=articulo).first()
+
+            totales_facturacion[delegacion] = data.tot_unid * data.p_alq_medio if data else 0
+
+        total_facturacion_articulo = sum(totales_facturacion.values())
+
+        for delegacion in delegaciones:
+            if delegacion == 'Andalucia':
+                data = Andalucia.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Levante':
+                data = Levante.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Madrid':
+                data = Madrid.objects.filter(articulo=articulo).first()
+            elif delegacion == 'Cataluña':
+                data = Cataluña.objects.filter(articulo=articulo).first()
+
+            if data:
+                tot_fact_alq_dia = data.tot_unid * data.p_alq_medio
+                tot_unid = data.tot_unid
+                p_alq_medio = data.p_alq_medio
+                porcentaje_fact = (tot_fact_alq_dia / total_facturacion_articulo * 100) if total_facturacion_articulo else 0
+                fila.append(f'{tot_fact_alq_dia:,.2f}')
+                fila.append(f'{tot_unid:,}')
+                fila.append(f'{p_alq_medio:.4f}')
+                fila.append(f'{porcentaje_fact:.2f}%')
+            else:
+                fila.extend([None, None, None, None])
+
+        resultados.append(fila)
+
+    df = pd.DataFrame(resultados, columns=['Articulo', 'Nombre'] +
+                      [f'{d} Tot.Fact.Alq.Dia' for d in delegaciones] +
+                      [f'{d} Tot.Unid' for d in delegaciones] +
+                      [f'{d} P.Alq.Medio' for d in delegaciones] +
+                      [f'{d} %Fact' for d in delegaciones])
+
+    # Guardar en un objeto en memoria para devolver como respuesta
+    output = BytesIO()
+    df.to_excel(output, index=False)
+    output.seek(0)
+
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="resultados_delegaciones.xlsx"'
+    return response
+
+
