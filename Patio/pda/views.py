@@ -15,6 +15,18 @@ from collections import defaultdict
 from pda.models import Articulo, Andalucia, Levante, Madrid, Cataluña
 import pandas as pd
 
+from openpyxl import load_workbook
+
+from django.conf import settings
+
+from io import BytesIO
+
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+
+from openpyxl.utils import get_column_letter
+
+
+
 def iniciar_tarea(request):
     if request.method == 'POST':
         form = PatioForm(request.POST)
@@ -431,8 +443,8 @@ def exportar_trabajadores_excel(request):
    return response
 
 
-
 def comparativa_productividad(request):
+    
 
     periodo = request.GET.get('periodo')
     hoy = date.today()
@@ -491,68 +503,175 @@ def comparativa_productividad(request):
         'periodo': periodo
     })
     
-from io import BytesIO
-
-def exportar_datos(request): 
+def exportar_datos(request):
     delegaciones = ['Andalucia', 'Levante', 'Madrid', 'Cataluña']
+    modelos = {
+        'Andalucia': Andalucia,
+        'Levante': Levante,
+        'Madrid': Madrid,
+        'Cataluña': Cataluña
+    }
+
     resultados = []
+    columnas = ['Articulo', 'Nombre']
+    for deleg in delegaciones:
+        columnas.extend([
+            f'{deleg} Tot.Fact.Alq.Dia', f'{deleg} Tot.Unid',
+            f'{deleg} P.Alq.Medio', f'{deleg} %Fact'
+        ])
+    columnas.extend([
+        'General Tot.Fact.Alq.Dia', 'General Tot.Unid',
+        'General P.Alq.Medio', 'General %Fact'
+    ])
+
+    # 🔹 Total facturación por delegación (para calcular %Fact)
+    total_fact_deleg = {}
+    for deleg in delegaciones:
+        total = 0
+        for data in modelos[deleg].objects.all():
+            total += data.tot_unid * data.p_alq_medio
+        total_fact_deleg[deleg] = total / 100
+
+    totales_por_deleg = {deleg: 0 for deleg in delegaciones}
 
     for articulo in Articulo.objects.all():
-        nombre_articulo = articulo.nombre
-        fila = [articulo.id, nombre_articulo]
-        totales_facturacion = {}
+        if not any(modelos[deleg].objects.filter(articulo=articulo).exists() for deleg in delegaciones):
+            continue
 
-        for delegacion in delegaciones:
-            if delegacion == 'Andalucia':
-                data = Andalucia.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Levante':
-                data = Levante.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Madrid':
-                data = Madrid.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Cataluña':
-                data = Cataluña.objects.filter(articulo=articulo).first()
+        fila = [articulo.id, articulo.nombre]
+        general_total_fact = 0
+        general_total_unid = 0
 
-            totales_facturacion[delegacion] = data.tot_unid * data.p_alq_medio if data else 0
-
-        total_facturacion_articulo = sum(totales_facturacion.values())
-
-        for delegacion in delegaciones:
-            if delegacion == 'Andalucia':
-                data = Andalucia.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Levante':
-                data = Levante.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Madrid':
-                data = Madrid.objects.filter(articulo=articulo).first()
-            elif delegacion == 'Cataluña':
-                data = Cataluña.objects.filter(articulo=articulo).first()
-
+        # Obtener datos por delegación y acumular generales
+        data_por_deleg = {}
+        for deleg in delegaciones:
+            data = modelos[deleg].objects.filter(articulo=articulo).first()
+            data_por_deleg[deleg] = data
             if data:
-                tot_fact_alq_dia = data.tot_unid * data.p_alq_medio
-                tot_unid = data.tot_unid
-                p_alq_medio = data.p_alq_medio
-                porcentaje_fact = (tot_fact_alq_dia / total_facturacion_articulo * 100) if total_facturacion_articulo else 0
-                fila.append(f'{tot_fact_alq_dia:,.2f}')
-                fila.append(f'{tot_unid:,}')
-                fila.append(f'{p_alq_medio:.4f}')
-                fila.append(f'{porcentaje_fact:.2f}%')
+                tot = data.tot_unid * data.p_alq_medio / 100
+                totales_por_deleg[deleg] += tot
+                general_total_fact += tot
+                general_total_unid += data.tot_unid
+
+        # Rellenar fila por delegación
+        for deleg in delegaciones:
+            data = data_por_deleg[deleg]
+            if data:
+                tot = data.tot_unid * data.p_alq_medio / 100
+                p_medio = data.p_alq_medio / 100
+                total_deleg = total_fact_deleg[deleg]
+                porcentaje = (tot / total_deleg * 100) if total_deleg else 0
+                fila += [
+                    f'{tot:,.2f}', f'{data.tot_unid:,}', f'{p_medio:.4f}', f'{porcentaje:.2f}%'
+                ]
             else:
-                fila.extend([None, None, None, None])
+                fila += ['-', '-', '-', '-']
+
+        # General
+        if general_total_unid:
+            p_general_medio = general_total_fact / general_total_unid
+        else:
+            p_general_medio = 0
+        fila += [
+            f'{general_total_fact:,.2f}', f'{general_total_unid:,}',
+            f'{p_general_medio:.4f}', '100.00%'
+        ]
 
         resultados.append(fila)
 
-    df = pd.DataFrame(resultados, columns=['Articulo', 'Nombre'] +
-                      [f'{d} Tot.Fact.Alq.Dia' for d in delegaciones] +
-                      [f'{d} Tot.Unid' for d in delegaciones] +
-                      [f'{d} P.Alq.Medio' for d in delegaciones] +
-                      [f'{d} %Fact' for d in delegaciones])
+    df = pd.DataFrame(resultados)
 
-    # Guardar en un objeto en memoria para devolver como respuesta
     output = BytesIO()
-    df.to_excel(output, index=False)
+    df.to_excel(output, index=False, header=False, startrow=4)
     output.seek(0)
 
-    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="resultados_delegaciones.xlsx"'
+    wb = load_workbook(output)
+    ws = wb.active
+
+    # Estilos
+    bold = Font(bold=True)
+    center = Alignment(horizontal='center', vertical='center')
+    border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+    colores = {
+        'Andalucia': 'FFF2CC', 'Levante': 'D9EAD3',
+        'Madrid': 'CFE2F3', 'Cataluña': 'F4CCCC'
+    }
+
+    # Título
+    fecha = datetime.today().strftime('%d/%m/%Y')
+    titulo = f"Ranking Articulos Comparativo Obras Activas por Delegación a Fecha: {fecha}"
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(columnas))
+    c = ws.cell(row=1, column=1)
+    c.value = titulo
+    c.font = Font(size=14, bold=True, color='FFFFFF')
+    c.alignment = center
+    c.fill = PatternFill(start_color='4F81BD', end_color='4F81BD', fill_type='solid')
+
+    # Encabezados
+    ws.merge_cells(start_row=2, start_column=1, end_row=3, end_column=1)
+    ws.cell(row=2, column=1, value='Articulo').font = bold
+    ws.cell(row=2, column=1).alignment = center
+
+    ws.merge_cells(start_row=2, start_column=2, end_row=3, end_column=2)
+    ws.cell(row=2, column=2, value='Nombre').font = bold
+    ws.cell(row=2, column=2).alignment = center
+
+    start_col = 3
+    for deleg in delegaciones:
+        ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=start_col + 3)
+        cell = ws.cell(row=2, column=start_col)
+        cell.value = deleg
+        cell.font = bold
+        cell.alignment = center
+        fill = PatternFill(start_color=colores[deleg], end_color=colores[deleg], fill_type='solid')
+        for col in range(start_col, start_col + 4):
+            ws.cell(row=2, column=col).fill = fill
+            ws.cell(row=3, column=col).fill = fill
+        start_col += 4
+
+    # General
+    ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=start_col + 3)
+    cell = ws.cell(row=2, column=start_col)
+    cell.value = 'General'
+    cell.font = bold
+    cell.alignment = center
+    for col in range(start_col, start_col + 4):
+        ws.cell(row=3, column=col).fill = PatternFill(start_color='D9D9D9', end_color='D9D9D9', fill_type='solid')
+
+    # Subencabezados
+    subcols = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
+    col = 3
+    for _ in delegaciones + ['General']:
+        for sub in subcols:
+            cell = ws.cell(row=3, column=col)
+            cell.value = sub
+            cell.font = bold
+            cell.alignment = center
+            cell.border = border
+            col += 1
+
+    # Totales de alquiler por día
+    fila_total = ['-', 'TOTAL ALQUILER POR DÍA']
+    for deleg in delegaciones:
+        total = totales_por_deleg[deleg]
+        fila_total += [f'{total:,.2f}', '-', '-', '-']
+    fila_total += ['-', '-', '-', '-']
+    ws.append(fila_total)
+
+    # Ajuste de anchos
+    for i, col_cells in enumerate(ws.columns, start=1):
+        max_len = max((len(str(c.value)) for c in col_cells if c.value), default=0)
+        ws.column_dimensions[get_column_letter(i)].width = max_len + 2
+    ws.column_dimensions['A'].width = 15
+    ws.column_dimensions['B'].width = 50
+
+    final_output = BytesIO()
+    wb.save(final_output)
+    final_output.seek(0)
+
+    response = HttpResponse(final_output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="ranking_articulos_delegaciones.xlsx"'
     return response
-
-
