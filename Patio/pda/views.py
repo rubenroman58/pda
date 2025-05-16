@@ -512,7 +512,6 @@ def exportar_datos(request):
         'Cataluña': Cataluña
     }
 
-    resultados = []
     columnas = ['Articulo', 'Nombre']
     for deleg in delegaciones:
         columnas.extend([
@@ -524,7 +523,7 @@ def exportar_datos(request):
         'General P.Alq.Medio', 'General %Fact'
     ])
 
-    # 🔹 Total facturación por delegación (para calcular %Fact)
+    # Total facturación por delegación (para %Fact por delegación)
     total_fact_deleg = {}
     for deleg in delegaciones:
         total = 0
@@ -532,7 +531,9 @@ def exportar_datos(request):
             total += data.tot_unid * data.p_alq_medio
         total_fact_deleg[deleg] = total / 100
 
+    # Fase 1: calcular totales por delegación y por artículo
     totales_por_deleg = {deleg: 0 for deleg in delegaciones}
+    datos_articulos = []
 
     for articulo in Articulo.objects.all():
         if not any(modelos[deleg].objects.filter(articulo=articulo).exists() for deleg in delegaciones):
@@ -541,9 +542,8 @@ def exportar_datos(request):
         fila = [articulo.id, articulo.nombre]
         general_total_fact = 0
         general_total_unid = 0
-
-        # Obtener datos por delegación y acumular generales
         data_por_deleg = {}
+
         for deleg in delegaciones:
             data = modelos[deleg].objects.filter(articulo=articulo).first()
             data_por_deleg[deleg] = data
@@ -553,7 +553,25 @@ def exportar_datos(request):
                 general_total_fact += tot
                 general_total_unid += data.tot_unid
 
-        # Rellenar fila por delegación
+        datos_articulos.append({
+            'articulo': articulo,
+            'fila_base': fila,
+            'data_por_deleg': data_por_deleg,
+            'general_total_fact': general_total_fact,
+            'general_total_unid': general_total_unid
+        })
+
+    # Fase 2: calcular total general de facturación
+    total_general = sum(totales_por_deleg.values())
+
+    # Fase 3: construir filas finales
+    resultados = []
+    for info in datos_articulos:
+        fila = info['fila_base']
+        general_total_fact = info['general_total_fact']
+        general_total_unid = info['general_total_unid']
+        data_por_deleg = info['data_por_deleg']
+
         for deleg in delegaciones:
             data = data_por_deleg[deleg]
             if data:
@@ -572,19 +590,21 @@ def exportar_datos(request):
             p_general_medio = general_total_fact / general_total_unid
         else:
             p_general_medio = 0
+        porcentaje_general = (general_total_fact / total_general * 100) if total_general else 0
+
         fila += [
             f'{general_total_fact:,.2f}', f'{general_total_unid:,}',
-            f'{p_general_medio:.4f}', '100.00%'
+            f'{p_general_medio:.4f}', f'{porcentaje_general:.3f}%'
         ]
-
         resultados.append(fila)
+        
+    # Crear DataFrame
+    df = pd.DataFrame(resultados, columns=columnas)
 
-    df = pd.DataFrame(resultados)
-
+    # Guardar en Excel
     output = BytesIO()
-    df.to_excel(output, index=False, header=False, startrow=4)
+    df.to_excel(output, index=False, header=True, startrow=4)
     output.seek(0)
-
     wb = load_workbook(output)
     ws = wb.active
 
@@ -614,7 +634,6 @@ def exportar_datos(request):
     ws.merge_cells(start_row=2, start_column=1, end_row=3, end_column=1)
     ws.cell(row=2, column=1, value='Articulo').font = bold
     ws.cell(row=2, column=1).alignment = center
-
     ws.merge_cells(start_row=2, start_column=2, end_row=3, end_column=2)
     ws.cell(row=2, column=2, value='Nombre').font = bold
     ws.cell(row=2, column=2).alignment = center
@@ -653,21 +672,31 @@ def exportar_datos(request):
             cell.border = border
             col += 1
 
-    # Totales de alquiler por día
+    # Totales por día
     fila_total = ['-', 'TOTAL ALQUILER POR DÍA']
     for deleg in delegaciones:
         total = totales_por_deleg[deleg]
         fila_total += [f'{total:,.2f}', '-', '-', '-']
-    fila_total += ['-', '-', '-', '-']
+    
+    total_general=sum(totales_por_deleg.values())
+    fila_total += [f'{total_general:,.2f}', '-', '-', '-']
     ws.append(fila_total)
+    
+    ultima_fila=ws.max_row
+    
+    for col in range (1,len(columnas)+1):
+        c = ws.cell(row=ultima_fila,column=col)
+        c.font = Font(bold=True,color='000000')
+     
 
-    # Ajuste de anchos
+    # Ajustar anchos de columnas
     for i, col_cells in enumerate(ws.columns, start=1):
         max_len = max((len(str(c.value)) for c in col_cells if c.value), default=0)
         ws.column_dimensions[get_column_letter(i)].width = max_len + 2
     ws.column_dimensions['A'].width = 15
     ws.column_dimensions['B'].width = 50
 
+    # Finalizar y devolver archivo
     final_output = BytesIO()
     wb.save(final_output)
     final_output.seek(0)
