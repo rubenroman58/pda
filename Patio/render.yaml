@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: patio-web
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn Patio.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: Patio.settings
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        value: clave-fake-para-dev
+      - key: ALLOWED_HOSTS
+        value: patio-web.onrender.com
