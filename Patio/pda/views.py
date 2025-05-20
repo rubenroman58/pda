@@ -442,23 +442,30 @@ def exportar_trabajadores_excel(request):
    wb.save(response)
    return response
 
-
 def comparativa_productividad(request):
-    
-
+    tareas_disponibles = TipoTarea.objects.all()
     periodo = request.GET.get('periodo')
     hoy = date.today()
-
-    # Obtener tareas según el periodo
     tareas = Patio.objects.all()
-    if periodo == 'dia':
-        tareas = tareas.filter(fecha=hoy)
-    elif periodo == 'semana':
-        inicio_semana = hoy - timedelta(days=hoy.weekday())
-        tareas = tareas.filter(fecha__gte=inicio_semana, fecha__lte=hoy)
-    elif periodo == 'mes':
-        tareas = tareas.filter(fecha__month=hoy.month, fecha__year=hoy.year)
-
+    
+    # Filtros de fechas
+    fecha_inicio_str = request.GET.get('fecha_inicio')
+    fecha_fin_str = request.GET.get('fecha_fin')
+    
+    if fecha_inicio_str and fecha_fin_str:
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+            tareas = tareas.filter(fecha__range=(fecha_inicio, fecha_fin))
+        except ValueError:
+            pass
+    
+    # Filtros de tipo de tarea
+    tarea_id = request.GET.get('tarea')
+    if tarea_id:
+        tareas = tareas.filter(idTipTarea=tarea_id)
+    
+   
     # Diccionario para estadísticas
     estadisticas_por_trabajador = defaultdict(lambda: {
         'cantidad': 0,
@@ -466,8 +473,10 @@ def comparativa_productividad(request):
         'num_tareas': 0,
         'productividad': 0,
         'nombre': '',
+        'apellidos': '',
     })
 
+    # Obtener tareas según el periodo
     for tarea in tareas:
         if tarea.horaInicio and tarea.horaFin:
             hora_inicio = datetime.combine(tarea.fecha, tarea.horaInicio)
@@ -482,11 +491,11 @@ def comparativa_productividad(request):
                         trabajador_obj = Trabajador.objects.get(id=operador_id)
                         stats = estadisticas_por_trabajador[operador_id]
                         stats['nombre'] = trabajador_obj.nombre
+                        stats['apellidos'] = trabajador_obj.apellidos
                         stats['cantidad'] += tarea.cantidad or 0
                         stats['tiempo_total'] += tiempo_segundos
                         stats['num_tareas'] += 1
                     except Trabajador.DoesNotExist:
-                        # Si no se encuentra el trabajador
                         stats = estadisticas_por_trabajador[operador_id]
                         stats['nombre'] = f'Operador ID {operador_id} no encontrado'
 
@@ -497,11 +506,25 @@ def comparativa_productividad(request):
 
     # Ordenar trabajadores por productividad
     trabajadores_ordenados = sorted(estadisticas_por_trabajador.items(), key=lambda x: x[1]['productividad'], reverse=True)
+    
+      
+    # Filtro por rango de productividad (nuevo)
+    min_prod = request.GET.get('min_prod')
+    max_prod = request.GET.get('max_prod')
 
+    if min_prod:
+        trabajadores_ordenados=[t for t in trabajadores_ordenados if t[1]['productividad'] >= float(min_prod)]
+        
+    if max_prod:
+        trabajadores_ordenados=[t for t in trabajadores_ordenados if t[1]['productividad'] <= float(max_prod)]
+
+    # Enviar los datos al template
     return render(request, 'comparativa_productividad.html', {
         'trabajadores': trabajadores_ordenados,
-        'periodo': periodo
+        'periodo': periodo,
+        'tareas_disponibles': tareas_disponibles
     })
+
     
 def exportar_datos(request):
     delegaciones = ['Andalucia', 'Levante', 'Madrid', 'Cataluña']
@@ -513,15 +536,10 @@ def exportar_datos(request):
     }
 
     columnas = ['Articulo', 'Nombre']
-    for deleg in delegaciones:
-        columnas.extend([
-            f'{deleg} Tot.Fact.Alq.Dia', f'{deleg} Tot.Unid',
-            f'{deleg} P.Alq.Medio', f'{deleg} %Fact'
-        ])
-    columnas.extend([
-        'General Tot.Fact.Alq.Dia', 'General Tot.Unid',
-        'General P.Alq.Medio', 'General %Fact'
-    ])
+    subcolumnas = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
+    for _ in delegaciones + ['General']:
+        columnas.extend(subcolumnas)
+
 
     # Total facturación por delegación (para %Fact por delegación)
     total_fact_deleg = {}
@@ -563,6 +581,7 @@ def exportar_datos(request):
 
     # Fase 2: calcular total general de facturación
     total_general = sum(totales_por_deleg.values())
+    datos_articulos.sort(key=lambda x: x['general_total_fact'],reverse=True)
 
     # Fase 3: construir filas finales
     resultados = []
@@ -603,7 +622,7 @@ def exportar_datos(request):
 
     # Guardar en Excel
     output = BytesIO()
-    df.to_excel(output, index=False, header=True, startrow=4)
+    df.to_excel(output, index=False, header=False, startrow=4)
     output.seek(0)
     wb = load_workbook(output)
     ws = wb.active
