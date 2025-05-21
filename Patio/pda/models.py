@@ -99,8 +99,8 @@ class Cataluña(models.Model):
     
     
 class Costes(models.Model):
-    Articulo=models.ForeignKey(Articulo,on_delete=models.CASCADE,null=True,related_name='articulo')
-    precio=models.DecimalField(max_digits=10,decimal_places=3)
-    
+    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE, null=True, related_name='costes')
+    precio = models.DecimalField(max_digits=10, decimal_places=3)
+
     def __str__(self):
-        return f"Tot.unid:{self.precio}"
+        return f"Precio: {self.precio} - Artículo: {self.articulo.nombre}"

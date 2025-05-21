@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from datetime import datetime,timedelta,date
 from django.db.models import Sum,Q
 from django.shortcuts import get_object_or_404
-from .models import Patio, Paquete,AlbaranDevolucion,LineaArticulo,TipoTarea,Trabajador,Articulo
+from .models import Patio, Paquete,AlbaranDevolucion,Costes,LineaArticulo,TipoTarea,Trabajador,Articulo
 from .forms import PatioForm,PaqueteForm,AlbaranForm,LineaArticulo,LineaArticuloForm,TrabajadorForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -14,15 +14,10 @@ from .utils import get_articulos_dict,get_tipos_tarea_dict,get_trabajadores_dict
 from collections import defaultdict
 from pda.models import Articulo, Andalucia, Levante, Madrid, Cataluña
 import pandas as pd
-
 from openpyxl import load_workbook
-
 from django.conf import settings
-
 from io import BytesIO
-
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-
 from openpyxl.utils import get_column_letter
 
 
@@ -539,8 +534,10 @@ def exportar_datos(request):
     subcolumnas = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
     for _ in delegaciones + ['General']:
         columnas.extend(subcolumnas)
+    
+    columnas.append('Coste Ud.')
 
-
+    coste_por_articulo={coste.articulo.id:coste.precio for coste in Costes.objects.all()}
     # Total facturación por delegación (para %Fact por delegación)
     total_fact_deleg = {}
     for deleg in delegaciones:
@@ -615,6 +612,10 @@ def exportar_datos(request):
             f'{general_total_fact:,.2f}', f'{general_total_unid:,}',
             f'{p_general_medio:.4f}', f'{porcentaje_general:.3f}%'
         ]
+        
+        articulo_id=info['articulo'].id
+        coste_unitario=coste_por_articulo.get(articulo_id,0)
+        fila.append(f"{coste_unitario:,.4f}")
         resultados.append(fila)
         
     # Crear DataFrame
@@ -706,8 +707,7 @@ def exportar_datos(request):
     for col in range (1,len(columnas)+1):
         c = ws.cell(row=ultima_fila,column=col)
         c.font = Font(bold=True,color='000000')
-     
-
+        
     # Ajustar anchos de columnas
     for i, col_cells in enumerate(ws.columns, start=1):
         max_len = max((len(str(c.value)) for c in col_cells if c.value), default=0)
