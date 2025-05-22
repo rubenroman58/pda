@@ -560,10 +560,6 @@ def exportar_datos(request):
         coste_total_andalucia[articulo_id] = coste_total
             
     
-    
-    
-    
-    
     # Total facturación por delegación (para %Fact por delegación)
     total_fact_deleg = {}
     for deleg in delegaciones:
@@ -595,6 +591,7 @@ def exportar_datos(request):
                 totales_por_deleg[deleg] += tot
                 general_total_fact += tot
                 general_total_unid += data.tot_unid
+            coste_por_delegacion=coste_unitario*data.tot_unid
 
         datos_articulos.append({
             'articulo': articulo,
