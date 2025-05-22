@@ -534,10 +534,36 @@ def exportar_datos(request):
     subcolumnas = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
     for _ in delegaciones + ['General']:
         columnas.extend(subcolumnas)
-    
     columnas.append('Coste Ud.')
+    columnas.append('Coste Total')
+    columnas.append('Coste Andalucia')
+    columnas.append('Coste Madrid')
+    columnas.append('Coste Cataluña')
+    columnas.append('Coste Levante')
 
     coste_por_articulo={coste.articulo.id:coste.precio for coste in Costes.objects.all()}
+    
+    total_unidades_andalucia={}
+    
+    for data in Andalucia.objects.all():
+        articulo_id=data.articulo.id
+        if articulo_id not in total_unidades_andalucia:
+            total_unidades_andalucia[articulo_id] = 0
+            
+        total_unidades_andalucia[articulo_id] += data.tot_unid
+        
+    coste_total_andalucia = {}
+    
+    for articulo_id, total_unid in total_unidades_andalucia.items():
+        coste_unitario = coste_por_articulo.get(articulo_id,0)
+        coste_total = coste_unitario * total_unid
+        coste_total_andalucia[articulo_id] = coste_total
+            
+    
+    
+    
+    
+    
     # Total facturación por delegación (para %Fact por delegación)
     total_fact_deleg = {}
     for deleg in delegaciones:
@@ -553,10 +579,12 @@ def exportar_datos(request):
     for articulo in Articulo.objects.all():
         if not any(modelos[deleg].objects.filter(articulo=articulo).exists() for deleg in delegaciones):
             continue
-
+        # Calcular coste total por delegación (solo para Andalucía)
         fila = [articulo.id, articulo.nombre]
         general_total_fact = 0
         general_total_unid = 0
+        
+        
         data_por_deleg = {}
 
         for deleg in delegaciones:
@@ -618,6 +646,10 @@ def exportar_datos(request):
         fila.append(f"{coste_unitario:,.4f}")
         resultados.append(fila)
         
+        for fila in resultados:
+         while len(fila) < len(columnas):
+          fila.append('-')  
+        
     # Crear DataFrame
     df = pd.DataFrame(resultados, columns=columnas)
 
@@ -666,6 +698,9 @@ def exportar_datos(request):
         cell.font = bold
         cell.alignment = center
         fill = PatternFill(start_color=colores[deleg], end_color=colores[deleg], fill_type='solid')
+        
+        data=data_por_deleg[deleg]
+
         for col in range(start_col, start_col + 4):
             ws.cell(row=2, column=col).fill = fill
             ws.cell(row=3, column=col).fill = fill
@@ -691,6 +726,25 @@ def exportar_datos(request):
             cell.alignment = center
             cell.border = border
             col += 1
+            
+            
+    headers_coste = ['Coste Ud.', 'Coste Total', 'Coste Andalucia', 'Coste Madrid', 'Coste Cataluña', 'Coste Levante']
+    for h in headers_coste:
+            ws.cell(row=3, column=col, value=h).font = bold
+            ws.cell(row=3, column=col).alignment = center
+            ws.cell(row=3, column=col).border = border
+            col += 1  # ¡Muy importante!
+
+    
+    
+    
+    # Definir el color de fondo
+    color_fondo = PatternFill(start_color="F4D03F", end_color="F4D03F", fill_type="solid")
+
+    # Aplicar el color a la celda A1
+    for cell in ['W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3']:
+       ws[cell].fill = color_fondo
+
 
     # Totales por día
     fila_total = ['-', 'TOTAL ALQUILER POR DÍA']
