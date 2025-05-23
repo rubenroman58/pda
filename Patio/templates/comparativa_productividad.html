@@ -143,12 +143,34 @@
     </form>
 
 
-    {% if request.GET.fecha_inicio and request.GET.fecha_fin%}
-    <p>Mostrando tareas entre {{request.GET.fecha_inicio}} y {{request.GET.fecha_fin}}</p>
-    {% else %}
-    <p>El filtro no está siendo usado</p>
+   {% if request.GET.fecha_inicio or request.GET.fecha_fin or request.GET.tarea or request.GET.min_prod or request.GET.max_prod %}
+    <p>Filtros aplicados:</p>
+    <ul>
+        {% if request.GET.fecha_inicio and request.GET.fecha_fin %}
+            <li>Fechas entre {{request.GET.fecha_inicio}} y {{ request.GET.fecha_fin}}</li>
+        {% elif request.GET.fecha_inicio %}
+            <li>Desde fecha: {{request.GET.fecha_inicio}}</li>
+        {% elif request.GET.fecha_fin %}
+            <li>Hasta fecha: {{request.GET.fecha_fin}}</li>
+        {% endif %}
+
+        {% if request.GET.tarea %}
+            <li>Tipo de tarea: {{request.GET.tarea}}</li>
+        {% endif %}
+
+        {% if request.GET.min_prod %}
+            <li>Productividad minima: {{request.GET.min_prod}}
+        {% endif %}
+        {% if request.GET.max_prod %}
+            <li>Productividad maxima: {{request.GET.max_prod}}</li>
+        {% endif %}
+    </ul>
+
+    {%  else %}
+    <p>No se ha aplicado ningún filtro</p>
     {% endif %}
 
+    </ul>
     <table>
         <thead>
             <tr>
@@ -173,13 +195,7 @@
 
                     <td>{{ stats.cantidad }}</td>
                     <td>{{ stats.num_tareas }}</td>
-                    <td>
-                        {% with total=stats.tiempo_total %}
-                            {% with h=total|divisibleby:3600 m=total|divisibleby:60 %}
-                                {{ total|floatformat:0|divisibleby:3600|floatformat:0 }}h
-                            {% endwith %}
-                        {% endwith %}
-                    </td>
+                    <td>{{ stats.tiempo_total_formateado }}</td>
                     <td>{{ stats.productividad }}</td>
                 </tr>
             {% empty %}

@@ -22,6 +22,7 @@ from openpyxl.utils import get_column_letter
 
 
 
+
 def iniciar_tarea(request):
     if request.method == 'POST':
         form = PatioForm(request.POST)
@@ -477,6 +478,9 @@ def comparativa_productividad(request):
             hora_inicio = datetime.combine(tarea.fecha, tarea.horaInicio)
             hora_fin = datetime.combine(tarea.fecha, tarea.horaFin)
             tiempo_segundos = (hora_fin - hora_inicio).total_seconds()
+            
+            print('tipo horaInicio,:',type(tarea.horaInicio))
+            print('tipo horaFin: ',type(tarea.horaFin))
 
             # Obtener los trabajadores por su ID
             for operador_id in [tarea.idOper1, tarea.idOper2]:
@@ -498,6 +502,13 @@ def comparativa_productividad(request):
     for stats in estadisticas_por_trabajador.values():
         if stats['tiempo_total'] > 0:
            stats['productividad'] = round(stats['cantidad'] / (stats['tiempo_total'] / 3600), 2)
+           
+           horas= int(stats['tiempo_total'] // 3600)
+           minutos= int((stats['tiempo_total'] % 3600) // 60)
+           segundos=int(stats['tiempo_total'] % 60)
+           stats['tiempo_total_formateado']=f'{horas:02d}:{minutos:02d}:{segundos:02d}'
+        else:
+            stats['tiempo_total_formateado']= '00:00:00'
 
     # Ordenar trabajadores por productividad
     trabajadores_ordenados = sorted(estadisticas_por_trabajador.items(), key=lambda x: x[1]['productividad'], reverse=True)
@@ -520,7 +531,7 @@ def comparativa_productividad(request):
         'tareas_disponibles': tareas_disponibles
     })
 
-    
+
 def exportar_datos(request):
     delegaciones = ['Andalucia', 'Levante', 'Madrid', 'Cataluña']
     modelos = {
@@ -534,33 +545,11 @@ def exportar_datos(request):
     subcolumnas = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
     for _ in delegaciones + ['General']:
         columnas.extend(subcolumnas)
-    columnas.append('Coste Ud.')
-    columnas.append('Coste Total')
-    columnas.append('Coste Andalucia')
-    columnas.append('Coste Madrid')
-    columnas.append('Coste Cataluña')
-    columnas.append('Coste Levante')
+    columnas.extend(['Coste Ud.', 'Coste Total', 'Coste Andalucia', 'Coste Madrid', 'Coste Cataluña', 'Coste Levante'])
 
-    coste_por_articulo={coste.articulo.id:coste.precio for coste in Costes.objects.all()}
-    
-    total_unidades_andalucia={}
-    
-    for data in Andalucia.objects.all():
-        articulo_id=data.articulo.id
-        if articulo_id not in total_unidades_andalucia:
-            total_unidades_andalucia[articulo_id] = 0
-            
-        total_unidades_andalucia[articulo_id] += data.tot_unid
-        
-    coste_total_andalucia = {}
-    
-    for articulo_id, total_unid in total_unidades_andalucia.items():
-        coste_unitario = coste_por_articulo.get(articulo_id,0)
-        coste_total = coste_unitario * total_unid
-        coste_total_andalucia[articulo_id] = coste_total
-            
-    
-    # Total facturación por delegación (para %Fact por delegación)
+    coste_por_articulo = {coste.articulo.id: coste.precio for coste in Costes.objects.all()}
+
+    # Total facturación por delegación
     total_fact_deleg = {}
     for deleg in delegaciones:
         total = 0
@@ -568,19 +557,16 @@ def exportar_datos(request):
             total += data.tot_unid * data.p_alq_medio
         total_fact_deleg[deleg] = total / 100
 
-    # Fase 1: calcular totales por delegación y por artículo
+    # Fase 1
     totales_por_deleg = {deleg: 0 for deleg in delegaciones}
     datos_articulos = []
 
     for articulo in Articulo.objects.all():
         if not any(modelos[deleg].objects.filter(articulo=articulo).exists() for deleg in delegaciones):
             continue
-        # Calcular coste total por delegación (solo para Andalucía)
         fila = [articulo.id, articulo.nombre]
         general_total_fact = 0
         general_total_unid = 0
-        
-        
         data_por_deleg = {}
 
         for deleg in delegaciones:
@@ -591,7 +577,6 @@ def exportar_datos(request):
                 totales_por_deleg[deleg] += tot
                 general_total_fact += tot
                 general_total_unid += data.tot_unid
-            coste_por_delegacion=coste_unitario*data.tot_unid
 
         datos_articulos.append({
             'articulo': articulo,
@@ -601,11 +586,10 @@ def exportar_datos(request):
             'general_total_unid': general_total_unid
         })
 
-    # Fase 2: calcular total general de facturación
     total_general = sum(totales_por_deleg.values())
-    datos_articulos.sort(key=lambda x: x['general_total_fact'],reverse=True)
+    datos_articulos.sort(key=lambda x: x['general_total_fact'], reverse=True)
 
-    # Fase 3: construir filas finales
+    # Fase 3
     resultados = []
     for info in datos_articulos:
         fila = info['fila_base']
@@ -626,7 +610,6 @@ def exportar_datos(request):
             else:
                 fila += ['-', '-', '-', '-']
 
-        # General
         if general_total_unid:
             p_general_medio = general_total_fact / general_total_unid
         else:
@@ -637,17 +620,31 @@ def exportar_datos(request):
             f'{general_total_fact:,.2f}', f'{general_total_unid:,}',
             f'{p_general_medio:.4f}', f'{porcentaje_general:.3f}%'
         ]
-        
-        articulo_id=info['articulo'].id
-        coste_unitario=coste_por_articulo.get(articulo_id,0)
-        fila.append(f"{coste_unitario:,.4f}")
+
+        articulo_id = info['articulo'].id
+        coste_unitario = coste_por_articulo.get(articulo_id, 0)
+        fila.append(f"{coste_unitario:,.4f}")  # Coste Ud.
+
+        # Coste Total general
+        coste_total_general = coste_unitario * general_total_unid
+        fila.append(f"{coste_total_general:,.2f}")
+
+        # Costes por delegación
+        for deleg in delegaciones:
+            data = data_por_deleg[deleg]
+            if data:
+                coste_deleg = coste_unitario * data.tot_unid
+                fila.append(f"{coste_deleg:,.2f}")
+            else:
+                fila.append('-')
+
         resultados.append(fila)
-        
-        for fila in resultados:
-         while len(fila) < len(columnas):
-          fila.append('-')  
-        
-    # Crear DataFrame
+
+    for fila in resultados:
+        while len(fila) < len(columnas):
+            fila.append('-')
+
+    # DataFrame
     df = pd.DataFrame(resultados, columns=columnas)
 
     # Guardar en Excel
@@ -660,14 +657,8 @@ def exportar_datos(request):
     # Estilos
     bold = Font(bold=True)
     center = Alignment(horizontal='center', vertical='center')
-    border = Border(
-        left=Side(style='thin'), right=Side(style='thin'),
-        top=Side(style='thin'), bottom=Side(style='thin')
-    )
-    colores = {
-        'Andalucia': 'FFF2CC', 'Levante': 'D9EAD3',
-        'Madrid': 'CFE2F3', 'Cataluña': 'F4CCCC'
-    }
+    border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    colores = {'Andalucia': 'FFF2CC', 'Levante': 'D9EAD3', 'Madrid': 'CFE2F3', 'Cataluña': 'F4CCCC'}
 
     # Título
     fecha = datetime.today().strftime('%d/%m/%Y')
@@ -695,15 +686,12 @@ def exportar_datos(request):
         cell.font = bold
         cell.alignment = center
         fill = PatternFill(start_color=colores[deleg], end_color=colores[deleg], fill_type='solid')
-        
-        data=data_por_deleg[deleg]
 
         for col in range(start_col, start_col + 4):
             ws.cell(row=2, column=col).fill = fill
             ws.cell(row=3, column=col).fill = fill
         start_col += 4
 
-    # General
     ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=start_col + 3)
     cell = ws.cell(row=2, column=start_col)
     cell.value = 'General'
@@ -712,7 +700,6 @@ def exportar_datos(request):
     for col in range(start_col, start_col + 4):
         ws.cell(row=3, column=col).fill = PatternFill(start_color='D9D9D9', end_color='D9D9D9', fill_type='solid')
 
-    # Subencabezados
     subcols = ['Tot.Fact.Alq.Dia', 'Tot.Unid', 'P.Alq.Medio', '%Fact']
     col = 3
     for _ in delegaciones + ['General']:
@@ -723,50 +710,38 @@ def exportar_datos(request):
             cell.alignment = center
             cell.border = border
             col += 1
-            
-            
-    headers_coste = ['Coste Ud.', 'Coste Total', 'Coste Andalucia', 'Coste Madrid', 'Coste Cataluña', 'Coste Levante']
+
+    headers_coste = ['Coste Ud.', 'Coste Total', 'Coste Andalucia', 'Coste Levante', 'Coste Madrid', 'Coste Cataluña']
     for h in headers_coste:
-            ws.cell(row=3, column=col, value=h).font = bold
-            ws.cell(row=3, column=col).alignment = center
-            ws.cell(row=3, column=col).border = border
-            col += 1  # ¡Muy importante!
+        ws.cell(row=3, column=col, value=h).font = bold
+        ws.cell(row=3, column=col).alignment = center
+        ws.cell(row=3, column=col).border = border
+        col += 1
 
-    
-    
-    
-    # Definir el color de fondo
+    # Color de fondo para encabezados de coste
     color_fondo = PatternFill(start_color="F4D03F", end_color="F4D03F", fill_type="solid")
-
-    # Aplicar el color a la celda A1
     for cell in ['W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3']:
-       ws[cell].fill = color_fondo
+        ws[cell].fill = color_fondo
 
-
-    # Totales por día
+    # Totales
     fila_total = ['-', 'TOTAL ALQUILER POR DÍA']
     for deleg in delegaciones:
         total = totales_por_deleg[deleg]
         fila_total += [f'{total:,.2f}', '-', '-', '-']
-    
-    total_general=sum(totales_por_deleg.values())
     fila_total += [f'{total_general:,.2f}', '-', '-', '-']
     ws.append(fila_total)
-    
-    ultima_fila=ws.max_row
-    
-    for col in range (1,len(columnas)+1):
-        c = ws.cell(row=ultima_fila,column=col)
-        c.font = Font(bold=True,color='000000')
-        
-    # Ajustar anchos de columnas
+
+    ultima_fila = ws.max_row
+    for col in range(1, len(columnas) + 1):
+        c = ws.cell(row=ultima_fila, column=col)
+        c.font = Font(bold=True, color='000000')
+
     for i, col_cells in enumerate(ws.columns, start=1):
         max_len = max((len(str(c.value)) for c in col_cells if c.value), default=0)
         ws.column_dimensions[get_column_letter(i)].width = max_len + 2
     ws.column_dimensions['A'].width = 15
     ws.column_dimensions['B'].width = 50
 
-    # Finalizar y devolver archivo
     final_output = BytesIO()
     wb.save(final_output)
     final_output.seek(0)
