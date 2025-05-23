@@ -1,107 +1,135 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inde-k Pdas</title>
+    <title>INDE-K | PDA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
     <style>
         body {
-            background: linear-gradient(45deg, #f3f3f3, #e8e8e8);
-            font-family: 'Arial', sans-serif;
-            color: #333;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 130vh;
-            flex-direction: column;
-        }
-
-        h1 {
-            text-align: center;
-            color: #ff6600;
-            font-size: 50px;
-            margin-bottom: 30px;
-        }
-
-        .container {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #f0f2f5, #e4e7ed);
+            color: #333;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
         }
 
-        .btn {
-            background-color: rgb(250, 169, 18);
+        header {
+            background-color: orange;
+            padding: 20px;
             color: white;
-            padding: 14px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 18px;
             text-align: center;
-            margin: 10px;
-            width: 200px;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
-        .btn:hover {
-            background-color: rgb(255, 186, 37);
-            transform: translateY(-5px);
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
         }
 
-        .btn i {
-            margin-right: 8px;
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        a {
-            text-decoration: none;
+        .main-content {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            padding: 40px 20px;
         }
 
-        .icon {
-            margin-right: 10px;
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .btn-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-card a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .btn-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color:orange;
+        }
+
+        footer {
+            background-color: orange;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
-<body>
-    <h1>Pdas Inde-k</h1>
 
-    <div class="container">
-        <a href="/iniciar_tarea/" class="btn"><i class="fas fa-play-circle icon"></i>Nueva tarea</a>
+<body>
+    <header>
+        <h1>Panel de Control PDA | INDE-K</h1>
+    </header>
+
+    <div class="main-content">
+        <div class="button-grid">
+            <div class="btn-card">
+                <i class="fas fa-play-circle"></i>
+                <a href="/iniciar_tarea/">Nueva tarea</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-list"></i>
+                <a href="/lista_tareas/">Lista Tareas</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-archive"></i>
+                <a href="/seleccionar_albaran/">Albaranes Devolución</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-box"></i>
+                <a href="/lista_albaranes/">Lista Albaranes</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-chart-bar"></i>
+                <a href="/estadisticas/">Estadísticas</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-info-circle"></i>
+                <a href="/informacionIndek/">Información Inde-k</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-file-alt"></i>
+                <a href="/informes/">Informes</a>
+            </div>
+            <div class="btn-card">
+                <i class="fas fa-sign-out-alt"></i>
+                <a href="/">Cerrar</a>
+            </div>
+        </div>
     </div>
-    <div class="container">
-        <a href="/lista_tareas/" class="btn"><i class="fas fa-list icon"></i>Lista Tareas</a>
-    </div>
-    <div class="container">
-        <a href="/seleccionar_albaran/" class="btn"><i class="fas fa-archive icon"></i>Albaranes Devolución</a>
-    </div>
-    <div class="container">
-        <a href="/lista_albaranes/" class="btn"><i class="fas fa-box icon"></i>Lista Albaranes Devolución</a>
-    </div>
-    <div class="container">
-        <a href="/estadisticas/" class="btn"><i class="fas fa-chart-bar icon"></i>Estadísticas</a>
-    </div>
-    <div class="container">
-        <a href="/informacionIndek/" class="btn"><i class="fas fa-info-circle icon"></i>Información Inde-k</a>
-    </div>
-    <div class="container">
-        <a href="/informes/" class="btn"><i class="fas fa-file-alt icon"></i>Informes</a>
-    </div>
-    <div class="container">
-        <a href="/" class="btn"><i class="fas fa-sign-out-alt icon"></i>Cerrar</a>
-    </div>
-   
+
+    <footer>
+        &copy; {{ year }} INDE-K | Todos los derechos reservados
+    </footer>
 </body>
 
 </html>

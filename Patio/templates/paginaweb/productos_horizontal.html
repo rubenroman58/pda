@@ -1,0 +1,354 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encofrado Horizontal - INDE-K</title>
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        p {
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        /* Sección principal de Encofrado Horizontal */
+        .producto-horizontal {
+            background: url("{% static 'img/encofrado-horizontal-bg.jpg' %}") center/cover no-repeat;
+            padding: 80px 20px;
+            color: #fff;
+            background-size: cover;
+            position: relative;
+            text-align: center;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Filtro para que el texto se lea bien sobre el fondo */
+        .producto-horizontal::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* Sombra para el fondo */
+            z-index: 0;
+        }
+
+        /* Información dentro de la sección */
+        .producto-info {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Fondo oscuro semitransparente para mejorar la visibilidad */
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .producto-info h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: #ff6600;
+            /* Color destacado para el título */
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+            /* Sombra para hacer el texto más llamativo */
+        }
+
+        .producto-info .subtitulo {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            /* Color dorado para el subtítulo */
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .producto-info p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #ddd;
+            text-align: justify;
+            margin-bottom: 20px;
+            text-indent: 1.5em;
+            font-weight: 300;
+            /* Texto más suave para la lectura */
+        }
+
+        /* Efectos en los textos */
+        .producto-info p:hover {
+            color: #ff6600;
+            /* Cambia el color del texto al pasar el ratón */
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Ajuste para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .producto-info h1 {
+                font-size: 2.5rem;
+                /* Reduce el tamaño del título en pantallas pequeñas */
+            }
+
+            .producto-info .subtitulo {
+                font-size: 1.4rem;
+            }
+
+            .producto-info p {
+                font-size: 1rem;
+            }
+        }
+
+        /* Estilo para el encabezado */
+        header {
+            background: linear-gradient(to right, #ff6600, #ffcc00);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header .logo img {
+            width: 150px;
+        }
+
+        /* Productos - Estilo de las tarjetas */
+        .productos-lista {
+            padding: 50px 20px;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        .productos-lista h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .producto-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .producto-card {
+            width: 280px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, opacity 0.6s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .producto-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .producto-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .producto-card img:hover {
+            transform: scale(1.1);
+        }
+
+        .producto-card h3 {
+            font-size: 1.6rem;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .producto-card p {
+            font-size: 1.1rem;
+            color: #777;
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #fff;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'img/logoIndek.jpg' %}" alt="Encofrados Inde-K">
+        </div>
+    </header>
+
+    <!-- Sección principal de Encofrado Horizontal -->
+    <section class="producto-horizontal">
+        <div class="producto-info">
+            <h1>ENCOFRADO HORIZONTAL</h1>
+            <p class="subtitulo">La solución más ágil para cada obra</p>
+            <p>
+                Diseñado por encofradores y materializado a través de los más rigurosos procesos de fabricación, el
+                sistema VERSATEC de INDE-K es hoy por hoy todo un referente de mercado.
+                Con más de 3.000.000 m² fabricados en los últimos 7 años, nuestro sistema de encofrado para techos
+                planos ofrece las mayores cotas de garantía y versatilidad.
+            </p>
+            <p>
+                Una importante vía para proteger la satisfacción de nuestros clientes es proteger nuestros productos,
+                otorgándoles en su concepción y diseño, detalles que los conviertan en únicos y respaldándolos, como en
+                este caso, con la Patente de Invención 2173039 aprobada por la Oficina Española de Patentes y Marcas.
+            </p>
+            <p>
+                La satisfacción de nuestros clientes avalará siempre nuestro crecimiento. Su confianza, nuestro
+                espíritu.
+            </p>
+        </div>
+    </section>
+
+    <!-- Productos - Versatec Series -->
+     <section class="productos-lista">
+        <h2>Series de Encofrado VERSATEC</h2>
+        <div class="producto-cards">
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-plus.png' %}" alt="Versatec Plus">
+                <h3>Versatec Plus</h3>
+                <p>El sistema más avanzado para encofrado horizontal, con alta resistencia y versatilidad.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-uno97.png' %}" alt="Versatec UNO ’97">
+                <h3>Versatec UNO ’97</h3>
+                <p>Diseñado para proyectos con requerimientos de alta eficiencia y facilidad de uso.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-uno.png' %}" alt="Versatec UNO">
+                <h3>Versatec UNO</h3>
+                <p>Una solución económica y efectiva para obras con plazos ajustados.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-jacena.png' %}" alt="Versatec JACENA">
+                <h3>Versatec JACENA</h3>
+                <p>Una estructura robusta para encofrado en grandes superficies horizontales.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-qbeta2.png' %}" alt="Versatec Qbeta2">
+                <h3>Versatec Qbeta2</h3>
+                <p>Una opción avanzada con materiales de calidad superior para entornos exigentes.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/versatec-qbeta1.png' %}" alt="Versatec Qbeta1">
+                <h3>Versatec Qbeta1</h3>
+                <p>Perfecto para obras que requieren máxima rigidez y durabilidad.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/qbeta.png' %}" alt="Qbeta">
+                <h3>Qbeta</h3>
+                <p>Un producto versátil para proyectos con necesidades específicas en estructuras horizontales.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/tablero.png' %}" alt="Tablero">
+                <h3>Tablero</h3>
+                <p>Tableros de alta calidad para garantizar la resistencia del encofrado.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/puntal.png' %}" alt="Puntal">
+                <h3>Puntal</h3>
+                <p>Ideal para dar soporte a las estructuras de encofrado horizontal.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox modal -->
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const images = document.querySelectorAll('.producto-card img');
+
+            // Efecto lightbox
+            images.forEach(img => {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', () => {
+                    lightboxImg.src = img.src;
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            lightbox.addEventListener('click', () => {
+                lightbox.style.display = 'none';
+                lightboxImg.src = '';
+                document.body.style.overflow = '';
+            });
+
+            // Animación de las tarjetas
+            const cards = document.querySelectorAll('.producto-card');
+            function mostrarCards() {
+                const triggerBottom = window.innerHeight * 0.85;
+
+                cards.forEach(card => {
+                    const cardTop = card.getBoundingClientRect().top;
+
+                    if (cardTop < triggerBottom) {
+                        card.classList.add('visible');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', mostrarCards);
+            mostrarCards(); // Ejecutar al cargar para mostrar los que ya están visibles
+        });
+    </script>
+
+</body>
+
+</html>

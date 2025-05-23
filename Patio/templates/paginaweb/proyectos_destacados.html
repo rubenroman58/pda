@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - INDE-K</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Cabecera Hero */
+        .clientes-hero {
+            background: url("{% static 'img/clientes-hero.jpg' %}") center/cover no-repeat;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .clientes-hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .clientes-hero h1,
+        .clientes-hero p {
+            position: relative;
+            z-index: 1;
+        }
+
+        .clientes-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .clientes-hero p {
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        /* Sección de Clientes */
+        .clientes-section {
+            padding: 80px 20px;
+            background-color: #fff;
+            text-align: center;
+        }
+
+        .clientes-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: orange;
+            text-transform: uppercase;
+        }
+
+        .clientes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .cliente-card {
+            width: 280px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, opacity 0.6s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .cliente-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .cliente-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .cliente-card h3 {
+            font-size: 1.6rem;
+            margin: 20px;
+            color: #333;
+        }
+
+        .cliente-card p {
+            font-size: 1rem;
+            color: #555;
+            margin: 0 20px 10px 20px;
+            text-align: justify;
+        }
+
+        .ver-proyecto {
+            display: inline-block;
+            margin: 0 20px 20px 20px;
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .ver-proyecto:hover {
+            background-color: #e85500;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cliente-card.visible:nth-child(1) { animation-delay: 0.1s; }
+        .cliente-card.visible:nth-child(2) { animation-delay: 0.3s; }
+        .cliente-card.visible:nth-child(3) { animation-delay: 0.5s; }
+        .cliente-card.visible:nth-child(4) { animation-delay: 0.7s; }
+
+        @media (max-width: 768px) {
+            .clientes-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Pie de página */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #333;
+            color: white;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Hero Section -->
+    <section class="clientes-hero">
+        <h1>Nuestra Experiencia, Nuestros Clientes</h1>
+        <p>Colaboraciones destacadas en todo el mundo</p>
+    </section>
+
+    <!-- Clientes -->
+    <section class="clientes-section">
+        <h2>Proyectos Destacados</h2>
+        <div class="clientes-container">
+            <!-- Tarjeta 1 -->
+            <div class="cliente-card">
+                <img src="{% static 'img/proyecto1.jpg' %}" alt="Proyecto 1">
+                <h3>Cárcel de Ras EL MA, Fez</h3>
+                <p>Colaboración con Jarquil para construir una de las prisiones más modernas de Marruecos.</p>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="cliente-card">
+                <img src="{% static 'img/proyecto2.jpg' %}" alt="Proyecto 2">
+                <h3>Carrefour Huelva</h3>
+                <p>INDE-K realiza 75.000 m² de encofrado en uno de los mayores centros comerciales del sur de España.</p>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="cliente-card">
+                <img src="{% static 'img/proyecto3.jpg' %}" alt="Proyecto 3">
+                <h3>Embajadas en Guinea</h3>
+                <p>Suministro completo de encofrado para embajadas españolas en Malabo y Bata.</p>
+            </div>
+
+            <!-- Tarjeta 4 -->
+            <div class="cliente-card">
+                <img src="{% static 'img/proyecto4.jpg' %}" alt="Proyecto 4">
+                <h3>Centro Árabe Arqueológico</h3>
+                <p>Proyecto integral en Tipaza (Argelia) con diseño, suministro y ejecución de encofrado.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        © 2025 INDE-K | Todos los derechos reservados
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.cliente-card');
+
+            function mostrarCards() {
+                const triggerBottom = window.innerHeight * 0.85;
+                cards.forEach(card => {
+                    const cardTop = card.getBoundingClientRect().top;
+                    if (cardTop < triggerBottom) {
+                        card.classList.add('visible');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', mostrarCards);
+            mostrarCards();
+        });
+    </script>
+</body>
+
+</html>

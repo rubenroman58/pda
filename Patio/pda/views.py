@@ -365,7 +365,7 @@ def detalles_albaran(request,albaran_id):
 
 def informacionIndek(request):
 
-    return render(request,'informacionIndek.html')
+    return render(request,'paginaweb/informacionIndek.html')
 
 
 def eliminar_alabarn(request, albaran_id):
@@ -749,3 +749,17 @@ def exportar_datos(request):
     response = HttpResponse(final_output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ranking_articulos_delegaciones.xlsx"'
     return response
+
+
+def productos_horizontal(request):
+    return render(request, 'paginaweb/productos_horizontal.html')
+
+def productos_vertical(request):
+    return render(request, 'paginaweb/productos_vertical.html')
+
+def proyectos_destacados(request):
+    return render(request, 'paginaweb/proyectos_destacados.html')
+
+
+def manuales(request):
+    return render(request, 'paginaweb/manuales.html')

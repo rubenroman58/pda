@@ -1,0 +1,308 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Encofrado Vertical - INDE-K</title>
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        p {
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        /* Sección principal de Encofrado Vertical */
+        .producto-vertical {
+            background: url("{% static 'img/encofrado-vertical-bg.jpg' %}") center/cover no-repeat;
+            padding: 80px 20px;
+            color: #fff;
+            background-size: cover;
+            position: relative;
+            text-align: center;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Filtro para que el texto se lea bien sobre el fondo */
+        .producto-vertical::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        /* Información dentro de la sección */
+        .producto-info {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .producto-info h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: #0073e6;
+            /* Color azul destacado para el título vertical */
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .producto-info .subtitulo {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #66b3ff;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .producto-info p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #ddd;
+            text-align: justify;
+            margin-bottom: 20px;
+            text-indent: 1.5em;
+            font-weight: 300;
+        }
+
+        /* Efectos en los textos */
+        .producto-info p:hover {
+            color: #0073e6;
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Ajuste para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .producto-info h1 {
+                font-size: 2.5rem;
+            }
+
+            .producto-info .subtitulo {
+                font-size: 1.4rem;
+            }
+
+            .producto-info p {
+                font-size: 1rem;
+            }
+        }
+
+        /* Estilo para el encabezado */
+        header {
+            background: linear-gradient(to right, #0073e6, #66b3ff);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header .logo img {
+            width: 150px;
+        }
+
+        /* Productos - Estilo de las tarjetas */
+        .productos-lista {
+            padding: 50px 20px;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        .productos-lista h2 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .producto-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .producto-card {
+            width: 280px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, opacity 0.6s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .producto-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .producto-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .producto-card img:hover {
+            transform: scale(1.1);
+        }
+
+        .producto-card h3 {
+            font-size: 1.6rem;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .producto-card p {
+            font-size: 1.1rem;
+            color: #777;
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'img/logoIndek.jpg' %}" alt="Encofrados Inde-K" />
+        </div>
+    </header>
+
+    <!-- Sección principal de Encofrado Vertical -->
+    <section class="producto-vertical">
+        <div class="producto-info">
+            <h1>ENCOFRADO VERTICAL</h1>
+            <p class="subtitulo">Soluciones robustas para muros y estructuras verticales</p>
+            <p>
+                Nuestro sistema de encofrado vertical está diseñado para garantizar la máxima seguridad y eficiencia en la construcción de muros, pilares y otros elementos verticales.
+            </p>
+            <p>
+                Fabricado con materiales de alta calidad y desarrollado con la tecnología más avanzada, el sistema INDE-K ofrece versatilidad y rapidez en el montaje y desmontaje.
+            </p>
+            <p>
+                Confía en nuestra experiencia para que tus proyectos verticales alcancen la excelencia estructural y estética que requieren.
+            </p>
+        </div>
+    </section>
+
+    <!-- Productos - Serie Encofrado Vertical -->
+    <section class="productos-lista">
+        <h2>Series de Encofrado VERTICAL</h2>
+        <div class="producto-cards">
+            <div class="producto-card">
+                <img src="{% static 'img/vertical-basic.png' %}" alt="Vertical Basic" />
+                <h3>Vertical Basic</h3>
+                <p>Una solución sencilla y económica para estructuras verticales estándar.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/vertical-plus.png' %}" alt="Vertical Plus" />
+                <h3>Vertical Plus</h3>
+                <p>Mayor resistencia y durabilidad para proyectos exigentes.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/vertical-pro.png' %}" alt="Vertical Pro" />
+                <h3>Vertical Pro</h3>
+                <p>El sistema más avanzado con tecnología modular para facilitar el montaje.</p>
+            </div>
+
+            <div class="producto-card">
+                <img src="{% static 'img/vertical-flex.png' %}" alt="Vertical Flex" />
+                <h3>Vertical Flex</h3>
+                <p>Versatilidad máxima para estructuras con formas irregulares.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox modal -->
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="" />
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const images = document.querySelectorAll('.producto-card img');
+
+            // Efecto lightbox
+            images.forEach((img) => {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', () => {
+                    lightboxImg.src = img.src;
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            lightbox.addEventListener('click', () => {
+                lightbox.style.display = 'none';
+                lightboxImg.src = '';
+                document.body.style.overflow = '';
+            });
+
+            // Animación de las tarjetas
+            const cards = document.querySelectorAll('.producto-card');
+            function mostrarCards() {
+                const triggerBottom = window.innerHeight * 0.85;
+
+                cards.forEach((card) => {
+                    const cardTop = card.getBoundingClientRect().top;
+
+                    if (cardTop < triggerBottom) {
+                        card.classList.add('visible');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', mostrarCards);
+            mostrarCards(); // Ejecutar al cargar para mostrar los que ya están visibles
+        });
+    </script>
+</body>
+
+</html>

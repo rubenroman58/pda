@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuales - INDE-K</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: orange;
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        /* Contenedor principal */
+        .manuales-container {
+            padding: 40px 10%;
+        }
+
+        /* Título principal */
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: orange;
+        }
+
+        /* Acordeón */
+        .accordion {
+            background-color: #eee;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            padding: 15px;
+            width: 100%;
+            text-align: left;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion:hover {
+            background-color: orange;
+            color: #fff;
+        }
+
+        /* Contenido del acordeón */
+        .panel {
+            padding: 0 15px;
+            display: none;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .panel a {
+            display: block;
+            padding: 8px;
+            color: orange;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .panel a:hover {
+            background-color: orange;
+            color: #fff;
+        }
+
+        /* Responsividad para dispositivos móviles */
+        @media (max-width: 768px) {
+            .manuales-container {
+                padding: 40px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Manuales de Montaje</h1>
+    </header>
+
+    <!-- Contenedor de los manuales -->
+    <div class="manuales-container">
+        <h3>Bienvenidos a nuestra nueva sección, donde podrás consultar los manuales de montaje de los distintos sistemas de encofrado que actualmente comercializa INDE-K.</h3>
+
+        <!-- Sistema Encofrado Horizontal Versatec -->
+        <button class="accordion">+ Sistema Encofrado Horizontal Versatec</button>
+        <div class="panel">
+            <a href="{% static 'manuales/versatec_plus.pdf' %}" target="_blank">Manual Montaje Versatec</a>
+        </div>
+
+        <!-- Sistema Encofrado Vertical Teide -->
+        <button class="accordion">+ Sistema Encofrado Vertical Teide</button>
+        <div class="panel">
+            <a href="{% static 'manuales/manual_montaje_teide_up.pdf' %}" target="_blank">Manual Montaje Teide Up</a>
+            <a href="{% static 'manuales/manual_montaje_teide_manuportable.pdf' %}" target="_blank">Manual Montaje Teide Manuportable</a>
+            <a href="{% static 'manuales/manual_montaje_teide_2c.pdf' %}" target="_blank">Manual Montaje Teide 2C</a>
+            <a href="{% static 'manuales/manual_montaje_teide_1c.pdf' %}" target="_blank">Manual Montaje Teide 1C</a>
+        </div>
+
+        <!-- Sistema Encofrado Pilares Teide -->
+        <button class="accordion">+ Sistema Encofrado Pilares Teide</button>
+        <div class="panel">
+            <a href="{% static 'manuales/pilar_teide4c.pdf' %}" target="_blank">Manual Montaje Pilares Teide</a>
+        </div>
+
+        <!-- Sistema Puntales -->
+        <button class="accordion">+ Sistemas Puntales</button>
+        <div class="panel">
+            <a href="{% static 'manuales/puntal_aluminio.pdf' %}" target="_blank">Manual Montaje Puntales</a>
+        </div>
+
+        <!-- Sistemas Acceso para Hormigonado y Ferrallado -->
+        <button class="accordion">+ Sistemas Acceso para Hormigonado y Ferrallado</button>
+        <div class="panel">
+            <a href="{% static 'manuales/manual_montaje_hormigonado.pdf' %}" target="_blank">Manual Montaje Acceso Hormigonado</a>
+            <a href="{% static 'manuales/manual_montaje_ferrallado.pdf' %}" target="_blank">Manual Montaje Acceso Ferrallado</a>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript para manejar el comportamiento del acordeón
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -7,202 +7,246 @@
     <title>Encofrados Inde-K</title>
     {% load static %}
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* Reseteo de márgenes y relleno */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+    /* Estilos generales del body */
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        background-color: #f4f4f4;
+        color: #333;
+    }
 
-        p {
-            text-align: justify;
-            text-indent: 2em;
-        }
+    /* Estilo del párrafo */
+    p {
+        text-align: justify;
+        text-indent: 2em;
+    }
 
-        header {
-            background: linear-gradient(to right, #ff6600, #ffcc00);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
+    /* Estilos de la cabecera */
+    header {
+        background: linear-gradient(to right, #ffcc00,#f46e15);
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+    }
 
-        header .logo img {
-            width: 150px;
-        }
+    /* Logo de la cabecera */
+    header .logo img {
+        width: 150px;
+    }
 
-        nav ul {
-            list-style: none;
-            padding: 0;
-        }
+    /* Estilos de la navegación */
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+    }
 
-        nav ul li {
-            display: inline;
-            margin: 0 15px;
-        }
+    nav ul li {
+        display: inline;
+        margin: 0 15px;
+    }
 
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
 
-        nav ul li a:hover {
-            text-decoration: underline;
-        }
+    nav ul li a:hover {
+        text-decoration: underline;
+    }
 
-        section {
-            padding: 40px;
-            margin: 20px auto;
-            max-width: 1000px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+    /* Estilos del dropdown */
+    .dropdown {
+        display: inline-block;
+    }
 
-        .section-background {
-            background-color: #333;
-            color: white;
-        }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #333;
+        min-width: 160px;
+        z-index: 1;
+        border-radius: 5px;
+    }
 
-        .section-white {
-            background-color: #fff;
-            color: #333;
-        }
+    .dropdown-content a {
+        color: white;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
 
-        h2 {
-            margin-bottom: 20px;
-            font-size: 2rem;
-        }
+    .dropdown-content a:hover {
+        background-color: #ff6600;
+    }
 
-        .product-list {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
 
-        .product-item {
-            width: 30%;
-            background-color: #f4f4f4;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+    .dropbtn {
+        color: white;
+        padding: 14px 20px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        background-color: transparent;
+        font-weight: bold;
+    }
 
-        .product-item img {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
+    .dropbtn:hover {
+        color: #ff6600;
+    }
 
-        .product-item h3 {
-            color: #ff6600;
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
+    /* Estilos para las secciones */
+    section {
+        padding: 40px;
+        margin: 20px auto;
+        max-width: 1000px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    .section-background {
+        background-color: #333;
+        color: white;
+    }
 
-        ul li {
-            margin: 5px 0;
-        }
+    .section-white {
+        background-color: #fff;
+        color: #333;
+    }
 
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            margin-top: 30px;
-        }
+    h2 {
+        margin-bottom: 20px;
+        font-size: 2rem;
+    }
 
-        .historia-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-            url("{% static 'img/imagen-historia.jpg' %}") center/cover no-repeat;
-            color: white;
-            padding: 60px 20px;
-            text-align: justify;
-        }
+    /* Estilos de los productos */
+    .product-list {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
 
-        .historia-content {
-            max-width: 900px;
-            margin: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            border-radius: 10px;
-        }
+    .product-item {
+        width: 30%;
+        background-color: #f4f4f4;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
 
-        .historia-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #ffcc00;
-        }
+    .product-item img {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        margin-bottom: 10px;
+    }
 
+    .product-item h3 {
+        color: #ff6600;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
 
-        .typing {
-            overflow: hidden;
-            white-space: normal;
-            border-right: 3px solid #ffcc00;
-            animation: typing 5s steps(80, end), blink-caret 0.75s step-end infinite;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 20px;
-            text-indent: 2em;
-        }
+    /* Estilo del footer */
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #333;
+        color: white;
+        margin-top: 30px;
+    }
 
-        .typing-delay {
-            animation-delay: 3s;
-            animation-duration: 6s;
-        }
+    /* Estilos de la sección historia */
+    .historia-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+        url("{% static 'img/imagen-historia.jpg' %}") center/cover no-repeat;
+        color: white;
+        padding: 60px 20px;
+        text-align: justify;
+    }
 
-        @keyframes typing {
-            from {
-                width: 0
-            }
+    .historia-content {
+        max-width: 900px;
+        margin: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 30px;
+        border-radius: 10px;
+    }
 
-            to {
-                width: 100%
-            }
-        }
+    .historia-content h2 {
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        text-align: center;
+        color: #ffcc00;
+    }
 
-        @keyframes blink-caret {
+    /* Animación de texto */
+    .typing {
+        overflow: hidden;
+        white-space: normal;
+        border-right: 3px solid #ffcc00;
+        animation: typing 5s steps(80, end), blink-caret 0.75s step-end infinite;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 20px;
+        text-indent: 2em;
+    }
 
-            from,
-            to {
-                border-color: transparent
-            }
+    .typing-delay {
+        animation-delay: 3s;
+        animation-duration: 6s;
+    }
 
-            50% {
-                border-color: #ffcc00
-            }
-        }
-    </style>
+    /* Animación de escritura */
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+        from, to { border-color: transparent }
+        50% { border-color: #ffcc00 }
+    }
+</style>
+
 </head>
 
 <body>
     <header>
-        <div class="logo">
-            <img src="{% static 'img/logo_indek.png' %}" alt="Encofrados Inde-K">
-        </div>
-        <nav>
-            <ul>
-                <li><a href="#historia">Historia</a></li>
-                <li><a href="#productos">Productos</a></li>
-                <li><a href="#expansion">Expansión</a></li>
-                <li><a href="#contacto">Contacto</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div class="logo">
+        <img src="{% static 'img/logoIndek.jpg' %}" alt="Encofrados Inde-K">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="">Información General</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Productos</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'productos_horizontal' %}">Encofrado Horizontal</a>
+                    <a href="{% url 'productos_vertical' %}">Encofrado Vertical</a>
+                </div>
+            </li>
+            <li><a href="{% url 'proyectos_destacados' %}">Proyectos detacados</a></li>
+            <li><a href="{% url 'manuales' %}">Manuales</a></li>
+        </ul>
+    </nav>
+</header>
+
+  
 
     <section id="historia" class="historia-section">
         <div class="historia-content">
